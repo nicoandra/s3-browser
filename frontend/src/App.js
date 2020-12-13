@@ -2,6 +2,12 @@ import './App.css';
 import {Credentials} from './credentials/Index'
 import {List} from './browse/List'
 import {BrowseBucket} from './browse/BrowseBucket'
+import Container from 'react-bootstrap/Container'
+import Navbar from 'react-bootstrap/Navbar'
+import Nav from 'react-bootstrap/Nav'
+import Row from 'react-bootstrap/Row'
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import {
   Switch,
@@ -12,28 +18,26 @@ import {
 
 function App() {
   return (
-      <div className="App">
-        <header className="App-header">
-          <Link to="/">S3 Browser</Link>
-        </header>
-        <nav>
-          <ul>
-            <li><Link to="/credentials">Set Credentials</Link></li>
-            <li><Link to="/browse">Browse Buckets</Link></li>
-          </ul>
-        </nav>
-        <main className="App-main">
+      <Container className="App">
+        <Navbar bg="light" expand="lg">
+          <Navbar.Brand><Link to="/browse">Browse Buckets</Link></Navbar.Brand>
+          <Nav.Link><Link to="/credentials">Set Credentials</Link></Nav.Link>
+          <Nav.Link><Link to="/">S3 Browser</Link></Nav.Link>
+        </Navbar>
+
+        <Row className="h-75">
           <Switch>
-            <Route exact path="/" render={()=>{ return "Thanks for setting this up"}} />
-            <Route exact path="/credentials" component={Credentials} />
-            <Route exact path="/browse" component={List} />
-            <Route path="/browse/:bucketName/:prefixes?" component={BrowseBucket} />
-          </Switch>
-        </main>
-        <footer className="App-footer">
+              <Route exact path="/" render={()=>{ return "Thanks for setting this up"}} />
+              <Route exact path="/credentials" component={Credentials} />
+              <Route exact path="/browse" component={List} />
+              <Route path="/browse/:bucketName/:prefixes?" component={BrowseBucket} />
+            </Switch>
+        </Row>
+
+        <Row as="footer">
           <div><a href="https://github.com/nicoandra/s3browser/">Source</a></div>
-        </footer>
-      </div>
+        </Row>
+      </Container>
   );
 }
 

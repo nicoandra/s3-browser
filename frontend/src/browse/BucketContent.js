@@ -91,18 +91,16 @@ export function BucketContent(props) {
 
   if (!ready) {
     return (
-      <Container className="align-middle">
-        <Row>
-          <Col>
-            <Spinner animation="border" variant="primary" />
-          </Col>
-        </Row>
-      </Container>
+      <Row className={props.className}>
+        <Col>
+          <Spinner animation="border" variant="primary" />
+        </Col>
+      </Row>
     );
   }
 
   return (
-    <Row>
+    <Row className={props.className}>
       <Col>
         <Row>
           <Col>

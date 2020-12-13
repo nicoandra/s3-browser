@@ -49,7 +49,7 @@ export class S3Controller {
     request.bucket = bucketName;
     request.key = key;
 
-    const s3Object = await this.s3Service.getObject(request);
+    const s3Object = await this.s3Service.getObjectHeaders(request);
     res.append('Content-Type', s3Object.ContentType);
     res.append('Content-Length', s3Object.ContentLength);
     this.s3Service.getObjectReadStream(request).pipe(res);

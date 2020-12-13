@@ -45,11 +45,11 @@ export class S3Service {
     });
   }
 
-  async getObject(params: GetAWSS3ObjectDto): Promise<any> {
+  async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
     this.getClient();
     return new Promise((ok, ko) => {
       const s3Params = params.toAwsGetObjectRequest();
-      this.s3Client.getObject(
+      this.s3Client.headObject(
         s3Params,
         (err: AWS.AWSError, data: AWS.S3.GetObjectOutput) => {
           if (err) return ko(err);

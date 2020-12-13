@@ -15,7 +15,7 @@ import { Switch, Route, Link } from "react-router-dom";
 
 function App() {
   return (
-    <Container className="App" fluid={true}>
+    <Container fluid={true}>
       <Navbar bg="light" expand="lg" className="App-header">
         <Navbar.Brand>
           <Link to="/browse">Browse Buckets</Link>
@@ -28,7 +28,8 @@ function App() {
         </Nav.Link>
       </Navbar>
 
-      <Row className="h-80 App-main">
+      
+      <Container fluid={true} className="App-main">
         <Switch>
           <Route
             exact
@@ -50,7 +51,7 @@ function App() {
             component={BucketBrowser}
           />
         </Switch>
-      </Row>
+      </Container>
 
       <Row as="footer" className="App-footer">
         <div>

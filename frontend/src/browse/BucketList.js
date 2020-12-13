@@ -21,7 +21,7 @@ export function BucketList(props) {
 
   if (!ready) {
     return (
-      <Container className="align-middle">
+      <Container className={"align-middle " + props.className}>
         <Row>
           <Col>
             <Spinner animation="border" variant="primary" />
@@ -32,32 +32,28 @@ export function BucketList(props) {
   }
 
   return (
-    <Row>
-      <Col>
-        <Table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bucketList.map((bucket) => (
-              <tr>
-                <td>
-                  <Link
-                    to={`/${baseUri}/${bucket.name}`}
-                    onClick={() => onBucketSelectionChange(bucket.name)}
-                  >
-                    {bucket.name}
-                  </Link>
-                </td>
-                <td>{bucket.createdAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Col>
-    </Row>
+    <Table className={props.className}>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {bucketList.map((bucket) => (
+          <tr>
+            <td>
+              <Link
+                to={`/${baseUri}/${bucket.name}`}
+                onClick={() => onBucketSelectionChange(bucket.name)}
+              >
+                {bucket.name}
+              </Link>
+            </td>
+            <td>{bucket.createdAt}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 }

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { get, getStream } from './../common'
 import { Link, useParams, useLocation } from "react-router-dom";
+import  {Row, Col, Navbar, Badge, Nav, Table, Breadcrumb, Spinner, Container} from 'react-bootstrap'
 import * as QueryString from "query-string"
 
  
 export function BucketContent(props) {
   const params = useParams()
-  console.log("ALL params", params)
   const { bucketName: bucketNameParams, prefixes:currentPrefixesParams } = useParams()
   const { search } = useLocation()
   const [contents, setContents] = useState([]);
@@ -16,8 +16,10 @@ export function BucketContent(props) {
   const [continuationTokenFromResponse, setContinuationTokenFromResponse] = useState();
   const [continuationTokenFromQuery, setContinuationTokenFromQuery] = useState();
   const baseUri = props.baseUri || 'browse'
+  const [ready, setReady] = useState(false);
 
   const fetchContent = (continuationToken) => {
+    setReady(false)
     let prefixesUri = currentPrefixes?.split('/').join('|')
     prefixesUri = prefixesUri ? '/' + prefixesUri : ''
     const continuationTokenUri = continuationToken ? `continuationToken=${encodeURIComponent(continuationToken)}&` : ''
@@ -25,6 +27,7 @@ export function BucketContent(props) {
       setContents(res.contents)
       setPrefixes(res.prefixes)
       setContinuationTokenFromResponse(res.continuationToken)
+      setReady(true)
     })
   }
 
@@ -57,18 +60,41 @@ export function BucketContent(props) {
 
   const backLink = <BackLink onClick={(evt) => removeLastPrefix()} currentPrefixes={currentPrefixes} bucketName={bucketName} baseUri={baseUri}/>
 
-  return (<div>
-    <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)} baseUri={baseUri} continuationToken={continuationTokenFromResponse}/>
-    <table>
-      <tr>
+  if (!ready) {
+    return (
+      <Container className="align-middle">
+        <Row>
+          <Col>
+            <Spinner animation="border" variant="primary"/>
+          </Col>
+        </Row>
+      </Container>
+    )
+  }
+
+  return (
+    <Row>
+      <Col>
+      <Row>
+        <Col>
+          <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)} baseUri={baseUri} continuationToken={continuationTokenFromResponse}/>
+        </Col>
+      </Row>
+      <Row>
+      <Table>
+        <thead>
+        <tr>
         <th>Key</th>
         <th>Last Update</th>
         <th>Size</th>
+        <th>Actions</th>
       </tr>
-
+        </thead>
+    <tbody>
       {backLink ? 
       <tr>
           <td>{backLink}</td>
+          <td></td>
           <td></td>
           <td></td>
       </tr> : ''}
@@ -78,18 +104,25 @@ export function BucketContent(props) {
           <td><PrefixLink bucketName={bucketName} prefix={prefix} currentPrefixes={currentPrefixes} onClick={(evt) => { addPrefix(prefix)}} baseUri={baseUri}/></td>
           <td></td>
           <td></td>
+          <td></td>
         </tr>          
         ))}
 
         {contents.map((row) => (
           <tr>
-            <td><DownloadLink bucketName={bucketName} objectKey={row.key} friendlyName={row.friendlyName} /></td>
+            <td>{row.friendlyName}</td>
             <td>{row.lastUpdate}</td>
             <td>{row.size}</td>
+            <td><DownloadLink bucketName={bucketName} objectKey={row.key} friendlyName="Download" /></td>
           </tr>
         ))}
-    </table>
-    </div>
+        </tbody>
+    </Table>
+      </Row>
+      </Col>
+    </Row>
+
+
   );
 
 
@@ -145,8 +178,7 @@ export function BrowseBucketHeader(props) {
   const {bucketName, itemCount, continuationToken} = props
   const prefixes = props.currentPrefixes.split('|')
 
-
-  const prefixPath = prefixes.map((v, i, arr) => {
+  const prefixButtons = prefixes.map((v, i, arr) => {
     return arr.filter((_v, _i) => _i <= i)
   }).map((c) => {
     const prefixes = c.join('|')
@@ -154,11 +186,20 @@ export function BrowseBucketHeader(props) {
       link: ['', props.baseUri, bucketName, prefixes].join('/'), text: c.slice(-1).pop(), prefixes
     }
   }).map((c) => {
-    return (<span><Link to={c.link} onClick={() => {props.onCurrentPrefixChange(c.prefixes)}}>{c.text}</Link> &gt; </span>)
+    return (<Breadcrumb.Item><Link to={c.link} onClick={() => {props.onCurrentPrefixChange(c.prefixes)}}>{c.text}</Link></Breadcrumb.Item>)
   })
 
-  const nextPage = continuationToken === undefined || <Link to={['', props.baseUri, bucketName, prefixes].join('/') + '?continuationToken=' + encodeURIComponent(continuationToken)}>Next</Link>
+  const prefixPath = <Breadcrumb>{prefixButtons}</Breadcrumb>
+  const nextPage = continuationToken === '' || <Link to={['', props.baseUri, bucketName, prefixes].join('/') + '?continuationToken=' + encodeURIComponent(continuationToken)}>Next</Link>
 
-return (<div> {bucketName} {prefixPath} ({itemCount} items) {nextPage} </div>)
+return (
+  <Navbar> 
+    <Nav className="mr-auto">
+    <Navbar.Brand>{bucketName}</Navbar.Brand> 
+    {prefixPath} 
+    <Badge >{itemCount} items</Badge>
+    </Nav>
+    {nextPage} 
+    </Navbar>)
 
 }

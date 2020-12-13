@@ -9,21 +9,30 @@ export class S3Controller {
     @Get('/')
     async get() {
         const buckets = await this.s3Service.listBuckets()
-        return buckets["Buckets"].map((bucket) => {
-            return {
-                name: bucket.Name,
-                createdAt: bucket.CreationDate
-            }
+        return new Promise((ok, ko) => {
+            setTimeout(() => {ok(1)}, 5000)
+        }).then(r => {
+
+            return buckets["Buckets"].map((bucket) => {
+                return {
+                    name: bucket.Name,
+                    createdAt: bucket.CreationDate
+                }
+            })
         })
+
     }
 
     @Get('/:bucketName/:prefixes?')
     async listContent(@Param('bucketName') bucketName: string, @Param('prefixes') prefixes:string, @Query() queryParams: GetBucketContentRequestDto) {
-
-        console.log("queryParams", queryParams)
         const params = GetBucketContentRequestDto.fromParams({bucketName, prefixes, ...queryParams})
         const result = await this.s3Service.listBucketContents(params.toListAWSS3BucketObjectsDto())
-        return GetBucketContentResponseDto.fromAwsResponse(result)
+
+        return new Promise((ok, ko) => {
+            setTimeout(() => {ok(1)}, 5000)
+        }).then(r => {
+            return GetBucketContentResponseDto.fromAwsResponse(result)
+        })
     }
 
     @Get('/:bucketName/:object/download')

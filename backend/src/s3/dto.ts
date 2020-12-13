@@ -105,12 +105,18 @@ export class ObjectHeaders {
 export class GetAWSS3ObjectDto {
   key: string;
   bucket: string;
+  byteRangeStart?: number
+  byteRangeEnd?: number
 
   toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
     const result = {
       Bucket: this.bucket,
       Key: this.key,
     };
+
+    if (this.byteRangeEnd !== undefined && this.byteRangeStart !== undefined && (this.byteRangeStart < this.byteRangeEnd)) {
+        result["Range"] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`
+    }
     return result;
   }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Row, Col } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import { BucketList } from "./BucketList";
 import { BucketContent } from "./BucketContent";
 

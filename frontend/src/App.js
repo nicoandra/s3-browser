@@ -29,7 +29,7 @@ function App() {
       </Navbar>
 
       
-      <Container fluid={true} className="App-main">
+      <Container fluid={true} className="" as="main">
         <Switch>
           <Route
             exact
@@ -53,10 +53,10 @@ function App() {
         </Switch>
       </Container>
 
-      <Row as="footer" className="App-footer">
-        <div>
+      <Row as="footer" className="footer">
+        <Container>
           <a href="https://github.com/nicoandra/s3browser/">Source</a>
-        </div>
+        </Container>
       </Row>
     </Container>
   );

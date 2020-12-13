@@ -1,6 +1,6 @@
-import React, { useEffect, useState  } from "react";
-import { Link, useParams } from "react-router-dom";
-import  {Row, Col} from 'react-bootstrap'
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import {Row, Col} from 'react-bootstrap'
 import {BucketList} from './BucketList'
 import {BucketContent} from './BucketContent'
  

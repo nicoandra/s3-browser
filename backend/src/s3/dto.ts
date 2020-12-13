@@ -11,7 +11,7 @@ export class ListAWSS3BucketObjectsDto {
     ContinuationToken?: string
     Delimiter: string = '/'
     FetchOwner: boolean = false
-    MaxKeys: number = 5
+    MaxKeys: number = 1000
     Prefix: string = ''
 }
 
@@ -53,10 +53,10 @@ export class GetBucketContentResponseDto {
         }).filter((s) => s.length > 0)
 
         result.contents = response.Contents.map((row: AWS.S3.Object) => BucketElementDto.fromAwsResponseContentRow(row, response.Prefix))
-        result.continuationToken = response.ContinuationToken || ''
+        result.continuationToken = response.NextContinuationToken || ''
         result.currentPrefixes = response.Prefix?.split(`/`).filter((s) => s.length > 0)
         return result
-    }    
+    }
 }
 
 export class BucketElementDto {

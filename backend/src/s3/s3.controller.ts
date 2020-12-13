@@ -19,6 +19,8 @@ export class S3Controller {
 
     @Get('/:bucketName/:prefixes?')
     async listContent(@Param('bucketName') bucketName: string, @Param('prefixes') prefixes:string, @Query() queryParams: GetBucketContentRequestDto) {
+
+        console.log("queryParams", queryParams)
         const params = GetBucketContentRequestDto.fromParams({bucketName, prefixes, ...queryParams})
         const result = await this.s3Service.listBucketContents(params.toListAWSS3BucketObjectsDto())
         return GetBucketContentResponseDto.fromAwsResponse(result)
@@ -36,11 +38,6 @@ export class S3Controller {
         res.append('Content-Type', s3Object.ContentType)
         res.append('Content-Length', s3Object.ContentLength)
         this.s3Service.getObjectReadStream(request).pipe(res)
-
-        // res.send("OK")
-
-        console.log(s3Object)
-
     }    
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState  } from "react";
 import { Link, useParams } from "react-router-dom";
 import  {Row, Col} from 'react-bootstrap'
 import {BucketList} from './BucketList'
@@ -12,8 +12,11 @@ export function BucketBrowser(props) {
         setActiveBucketName(bucketName)
     }
 
-    return (<Row>
-        <Col lg={3}><BucketList baseUri="browse-2" onBucketSelectionChange={bucketSelectionHandler}/></Col>
-        <Col><BucketContent baseUri="browse-2" bucketName={activeBucketName} prefixes={currentPrefixesParams}/></Col>
-    </Row>)
+    return (
+    <Row><Col>
+        <Row>
+            <Col lg={3}><BucketList baseUri="browse-2" onBucketSelectionChange={bucketSelectionHandler}/></Col>
+            <Col><BucketContent baseUri="browse-2" bucketName={activeBucketName} prefixes={currentPrefixesParams}/></Col>
+        </Row>
+    </Col></Row>)
 }

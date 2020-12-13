@@ -1,38 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { get, getStream } from './../common'
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
+import * as QueryString from "query-string"
 
  
 export function BucketContent(props) {
   const params = useParams()
   console.log("ALL params", params)
   const { bucketName: bucketNameParams, prefixes:currentPrefixesParams } = useParams()
+  const { search } = useLocation()
   const [contents, setContents] = useState([]);
   const [prefixes, setPrefixes] = useState([]);
   const [currentPrefixes, setCurrentPrefixes] = useState(currentPrefixesParams || '');
   const [bucketName, setBucketName] = useState(bucketNameParams);
+  const [continuationTokenFromResponse, setContinuationTokenFromResponse] = useState();
+  const [continuationTokenFromQuery, setContinuationTokenFromQuery] = useState();
   const baseUri = props.baseUri || 'browse'
 
-  const fetchContent = () => {
+  const fetchContent = (continuationToken) => {
     let prefixesUri = currentPrefixes?.split('/').join('|')
     prefixesUri = prefixesUri ? '/' + prefixesUri : ''
-    get(`/s3/${bucketName}${prefixesUri}`).then((res) => {
+    const continuationTokenUri = continuationToken ? `continuationToken=${encodeURIComponent(continuationToken)}&` : ''
+    get(`/s3/${bucketName}${prefixesUri}?${continuationTokenUri}`).then((res) => {
       setContents(res.contents)
       setPrefixes(res.prefixes)
+      setContinuationTokenFromResponse(res.continuationToken)
     })
   }
 
   useEffect(() => {
-    console.log("bucketNameParams", bucketNameParams, "props.bucketName", props.bucketName)
+    const parsed = QueryString.parse(search)
+    setContinuationTokenFromQuery(parsed.continuationToken)
+  }, [search])
+
+  useEffect(() => {
     setBucketName(bucketNameParams)
     setCurrentPrefixes('')
   }, [bucketNameParams])
 
   useEffect(() => {
+    fetchContent(continuationTokenFromQuery)
+  }, [continuationTokenFromQuery])
+
+
+  useEffect(() => {
     if (bucketName === undefined) {
       return;
     }
-    fetchContent()
+    fetchContent('')
   }, [currentPrefixes, bucketName])
 
 
@@ -43,7 +58,7 @@ export function BucketContent(props) {
   const backLink = <BackLink onClick={(evt) => removeLastPrefix()} currentPrefixes={currentPrefixes} bucketName={bucketName} baseUri={baseUri}/>
 
   return (<div>
-    <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)} baseUri={baseUri}/>
+    <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)} baseUri={baseUri} continuationToken={continuationTokenFromResponse}/>
     <table>
       <tr>
         <th>Key</th>
@@ -57,7 +72,6 @@ export function BucketContent(props) {
           <td></td>
           <td></td>
       </tr> : ''}
-
 
         {prefixes.map((prefix) => (
           <tr>
@@ -128,8 +142,9 @@ function PrefixLink(props) {
 }
 
 export function BrowseBucketHeader(props) {
-  const {bucketName, itemCount} = props
+  const {bucketName, itemCount, continuationToken} = props
   const prefixes = props.currentPrefixes.split('|')
+
 
   const prefixPath = prefixes.map((v, i, arr) => {
     return arr.filter((_v, _i) => _i <= i)
@@ -142,6 +157,8 @@ export function BrowseBucketHeader(props) {
     return (<span><Link to={c.link} onClick={() => {props.onCurrentPrefixChange(c.prefixes)}}>{c.text}</Link> &gt; </span>)
   })
 
-return (<div> {bucketName} {prefixPath} ({itemCount} items)</div>)
+  const nextPage = continuationToken === undefined || <Link to={['', props.baseUri, bucketName, prefixes].join('/') + '?continuationToken=' + encodeURIComponent(continuationToken)}>Next</Link>
+
+return (<div> {bucketName} {prefixPath} ({itemCount} items) {nextPage} </div>)
 
 }

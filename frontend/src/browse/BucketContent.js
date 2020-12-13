@@ -3,12 +3,15 @@ import { get, getStream } from './../common'
 import { Link, useParams } from "react-router-dom";
 
  
-export function BrowseBucket(props) {
-  const { bucketName: bucketNameProps, prefixes:currentPrefixesProps } = useParams()
+export function BucketContent(props) {
+  const params = useParams()
+  console.log("ALL params", params)
+  const { bucketName: bucketNameParams, prefixes:currentPrefixesParams } = useParams()
   const [contents, setContents] = useState([]);
   const [prefixes, setPrefixes] = useState([]);
-  const [currentPrefixes, setCurrentPrefixes] = useState(currentPrefixesProps || '');
-  const [bucketName, ] = useState(bucketNameProps);
+  const [currentPrefixes, setCurrentPrefixes] = useState(currentPrefixesParams || '');
+  const [bucketName, setBucketName] = useState(bucketNameParams);
+  const baseUri = props.baseUri || 'browse'
 
   const fetchContent = () => {
     let prefixesUri = currentPrefixes?.split('/').join('|')
@@ -20,14 +23,27 @@ export function BrowseBucket(props) {
   }
 
   useEffect(() => {
+    console.log("bucketNameParams", bucketNameParams, "props.bucketName", props.bucketName)
+    setBucketName(bucketNameParams)
+    setCurrentPrefixes('')
+  }, [bucketNameParams])
+
+  useEffect(() => {
+    if (bucketName === undefined) {
+      return;
+    }
     fetchContent()
-  }, [props.bucketName, currentPrefixes, props.prefixes])
+  }, [currentPrefixes, bucketName])
 
 
-  const backLink = <BackLink onClick={(evt) => removeLastPrefix()} currentPrefixes={currentPrefixes} bucketName={bucketName}/>
+  if (bucketName === undefined) {
+    return (<div>Pick a bucket</div>)
+  }
+
+  const backLink = <BackLink onClick={(evt) => removeLastPrefix()} currentPrefixes={currentPrefixes} bucketName={bucketName} baseUri={baseUri}/>
 
   return (<div>
-    <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)}/>
+    <BrowseBucketHeader bucketName={bucketName} currentPrefixes={currentPrefixes} itemCount={contents.length} onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)} baseUri={baseUri}/>
     <table>
       <tr>
         <th>Key</th>
@@ -45,7 +61,7 @@ export function BrowseBucket(props) {
 
         {prefixes.map((prefix) => (
           <tr>
-          <td><PrefixLink bucketName={bucketName} prefix={prefix} currentPrefixes={currentPrefixes} onClick={(evt) => { addPrefix(prefix)}}/></td>
+          <td><PrefixLink bucketName={bucketName} prefix={prefix} currentPrefixes={currentPrefixes} onClick={(evt) => { addPrefix(prefix)}} baseUri={baseUri}/></td>
           <td></td>
           <td></td>
         </tr>          
@@ -98,7 +114,7 @@ function BackLink(props) {
 
   prefixes = prefixes.slice(0, -1).join('|')
   
-  const uri = '/browse/' + bucketName + '/' + (prefixes ? prefixes : '')
+  const uri = `/${props.baseUri}/` + bucketName + '/' + (prefixes ? prefixes : '')
   return <Link to={uri} onClick={props.onClick}>..</Link>
 }
 
@@ -107,7 +123,7 @@ function PrefixLink(props) {
   const newPrefixes = currentPrefixes ? currentPrefixes.split('|') : []
   newPrefixes.push(prefix)
 
-  const uri = '/browse/' + bucketName + '/' + (currentPrefixes ? currentPrefixes + '|' : '') + (prefix.length ? prefix : '')
+  const uri = `/${props.baseUri}/` + bucketName + '/' + (currentPrefixes ? currentPrefixes + '|' : '') + (prefix.length ? prefix : '')
   return <Link to={uri} onClick={props.onClick}>{(prefix.length ? prefix : '..')}</Link>
 }
 
@@ -120,7 +136,7 @@ export function BrowseBucketHeader(props) {
   }).map((c) => {
     const prefixes = c.join('|')
     return {
-      link: ['', 'browse', bucketName, prefixes].join('/'), text: c.slice(-1).pop(), prefixes
+      link: ['', props.baseUri, bucketName, prefixes].join('/'), text: c.slice(-1).pop(), prefixes
     }
   }).map((c) => {
     return (<span><Link to={c.link} onClick={() => {props.onCurrentPrefixChange(c.prefixes)}}>{c.text}</Link> &gt; </span>)

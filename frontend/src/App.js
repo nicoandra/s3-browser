@@ -1,7 +1,5 @@
 import "./App.css";
 import { Credentials } from "./credentials/Index";
-import { BucketList } from "./browse/BucketList";
-import { BucketContent } from "./browse/BucketContent";
 import { BucketBrowser } from "./browse/BucketBrowser";
 
 import Container from "react-bootstrap/Container";

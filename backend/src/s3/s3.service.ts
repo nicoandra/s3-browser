@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
 import * as readline from 'readline';
-import { AWSS3ObjectVersionDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, ListAWSS3BucketObjectsDto } from './dto';
+import { AWSS3ObjectVersionDto, BucketAttributesDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, ListAWSS3BucketObjectsDto } from './dto';
 
 @Injectable()
 export class S3Service {
@@ -21,15 +21,22 @@ export class S3Service {
     return this.s3Client;
   }
 
-  async listBuckets() {
+  async listBuckets() : Promise<BucketAttributesDto[]>{
     this.getClient();
     return new Promise((ok, ko) => {
       this.s3Client.listBuckets(
         (err: AWS.AWSError, data: AWS.S3.ListBucketsOutput) => {
           if (err) return ko(err);
-          return ok(data);
+          return ok(data['Buckets']);
         },
       );
+    }).then((buckets: [AWS.S3.Bucket]) => {
+      return buckets.map((bucket) => {
+        return <BucketAttributesDto> {
+          name: bucket.Name,
+          createdAt: bucket.CreationDate,
+        };
+      });
     });
   }
 
@@ -97,8 +104,7 @@ export class S3Service {
 
     for await (const l of reader) {
       const match = words.reduce((match, word) => {
-        if (!match) return false;
-        return l.includes(word)
+        return match && l.includes(word)
       }, true)
 
       if(match) yield l

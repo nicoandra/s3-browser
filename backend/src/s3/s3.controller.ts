@@ -1,13 +1,10 @@
 import { Controller, Get, Inject, Param, Query, Res } from '@nestjs/common';
 import {
   GetAWSS3ObjectDto,
-  GetAWSS3ObjectVersionsDto,
   GetBucketContentRequestDto,
   GetBucketContentResponseDto,
 } from './dto';
 import { S3Service } from './s3.service';
-import * as readline from 'readline';
-import { Readable } from 'stream'
 
 
 @Controller('s3')
@@ -16,13 +13,7 @@ export class S3Controller {
 
   @Get('/')
   async get() {
-    const buckets = await this.s3Service.listBuckets();
-    return buckets['Buckets'].map((bucket) => {
-      return {
-        name: bucket.Name,
-        createdAt: bucket.CreationDate,
-      };
-    });
+    return this.s3Service.listBuckets();
   }
 
   @Get('/:bucketName/:prefixes?')

@@ -152,6 +152,11 @@ export class GetObjectDto {
   }
 }
 
+export class BucketAttributesDto {
+  name: string
+  createdAt: Date
+}
+
 export class GetAWSS3ObjectVersionsDto {
     key: string;
     bucket: string;

@@ -115,7 +115,6 @@ export function BucketContent(props) {
             <BrowseBucketHeader
               bucketName={bucketName}
               currentPrefixes={currentPrefixes}
-              itemCount={contents.length}
               onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)}
               baseUri={baseUri}
               continuationToken={continuationTokenFromResponse}
@@ -344,7 +343,7 @@ function PrefixLink(props) {
 }
 
 export function BrowseBucketHeader(props) {
-  const { bucketName, itemCount, continuationToken } = props;
+  const { bucketName, continuationToken } = props;
   const prefixes = props.currentPrefixes.split("|");
 
   const prefixButtons = [{
@@ -398,7 +397,6 @@ export function BrowseBucketHeader(props) {
     <Navbar>
       <Nav className="mr-auto">
         {prefixPath}
-        <Badge>{itemCount} items</Badge>
       </Nav>
       <Form inline>
         {searchInListTextBox}

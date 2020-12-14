@@ -18,13 +18,10 @@ export function BucketBrowser(props) {
   return (
     <Row>
             <BucketList
-              baseUri="browse-2"
               onBucketSelectionChange={bucketSelectionHandler}
               className="col-md-1"
             />
-
             <BucketContent
-              baseUri="browse-2"
               bucketName={activeBucketName}
               prefixes={currentPrefixesParams}
               className="col-xl-10"

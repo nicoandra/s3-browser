@@ -23,11 +23,7 @@ function App() {
         <Nav.Link>
           <Link to="/credentials">Set Credentials</Link>
         </Nav.Link>
-        <Nav.Link>
-          <Link to="/browse-2">S3 Browser</Link>
-        </Nav.Link>
       </Navbar>
-
       
       <Container fluid={true} className="" as="main">
         <Switch>
@@ -39,17 +35,11 @@ function App() {
             }}
           />
           <Route exact path="/credentials" component={Credentials} />
-          <Route exact path="/browse" component={BucketList} />
           <Route
             path="/browse/:bucketName/:prefixes?"
-            component={BucketContent}
-          />
-
-          <Route exact path="/browse-2" component={BucketBrowser} />
-          <Route
-            path="/browse-2/:bucketName/:prefixes?"
             component={BucketBrowser}
           />
+          <Route exact path="/browse" component={BucketBrowser} />
         </Switch>
       </Container>
 

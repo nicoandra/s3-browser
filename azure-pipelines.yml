@@ -12,9 +12,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-  - stage: 'Install OS'
+  - stage: 'InstallOS'
     jobs:
-    - job: "Install OS"
+    - job: "InstallOS"
       steps:
         - task: NodeTool@0
           inputs:

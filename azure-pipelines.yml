@@ -20,7 +20,7 @@ stages:
           inputs:
             versionSpec: '10.x'
           displayName: 'Install Node.js'
-  - stage: 'Build FrontEnd'
+  - stage: 'BuildFrontEnd'
     jobs:
     - job: CheckChanges
       displayName: 'Check changes'

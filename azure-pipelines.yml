@@ -32,9 +32,9 @@ stages:
       steps:
       - script: |
           cd frontend
-          echo "Build Succeess!"
+          echo "Build Success!"
         displayName: 'FrontEnd - Install and Build'
-  - stage: 'BuildFrontEnd'
+  - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_checkchanges.yml'
       parameters:
@@ -46,5 +46,5 @@ stages:
       steps:
       - script: |
           cd backend
-          echo "Build Succeess!"
+          echo "Build Success!"
         displayName: 'Backend - Install and Build'        

@@ -1,7 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { get, getStream } from "./../common";
 import { Link, useParams, useLocation } from "react-router-dom";
-import { BsCloudDownload, BsFolder, BsFileEarmarkCheck, BsEye, BsCalendar } from 'react-icons/bs'
+import {
+  BsCloudDownload,
+  BsFolder,
+  BsFileEarmarkCheck,
+  BsEye,
+  BsCalendar,
+} from "react-icons/bs";
 import {
   Row,
   Col,
@@ -11,7 +17,8 @@ import {
   Table,
   Breadcrumb,
   Spinner,
-  Form, Button
+  Form,
+  Button,
 } from "react-bootstrap";
 import * as QueryString from "query-string";
 
@@ -22,8 +29,8 @@ export function BucketContent(props) {
   } = useParams();
   const { search } = useLocation();
   const [contents, setContents] = useState([]);
-  const [grepText, setGrepText] = useState('');
-  const [filterText, setFilterText] = useState('');
+  const [grepText, setGrepText] = useState("");
+  const [filterText, setFilterText] = useState("");
   const [prefixes, setPrefixes] = useState([]);
   const [currentPrefixes, setCurrentPrefixes] = useState(
     currentPrefixesParams || ""
@@ -40,26 +47,29 @@ export function BucketContent(props) {
   const baseUri = props.baseUri || "browse";
   const [ready, setReady] = useState(false);
 
-  const memoizedFetchContent = useCallback((continuationToken) => {
-    const fetchContent = (continuationToken) => {
-      setReady(false);
-      let prefixesUri = currentPrefixes?.split("/").join("|");
-      prefixesUri = prefixesUri ? "/" + prefixesUri : "";
-      const continuationTokenUri = continuationToken
-        ? `continuationToken=${encodeURIComponent(continuationToken)}&`
-        : "";
-      get(`/s3/${bucketName}${prefixesUri}?${continuationTokenUri}`).then(
-        (res) => {
-          setContents(res.contents);
-          setPrefixes(res.prefixes);
-          setContinuationTokenFromResponse(res.continuationToken);
-          setReady(true);
-        }
-      );
-    };
-  
-    fetchContent(continuationToken);
-  }, [currentPrefixes, bucketName])
+  const memoizedFetchContent = useCallback(
+    (continuationToken) => {
+      const fetchContent = (continuationToken) => {
+        setReady(false);
+        let prefixesUri = currentPrefixes?.split("/").join("|");
+        prefixesUri = prefixesUri ? "/" + prefixesUri : "";
+        const continuationTokenUri = continuationToken
+          ? `continuationToken=${encodeURIComponent(continuationToken)}&`
+          : "";
+        get(`/s3/${bucketName}${prefixesUri}?${continuationTokenUri}`).then(
+          (res) => {
+            setContents(res.contents);
+            setPrefixes(res.prefixes);
+            setContinuationTokenFromResponse(res.continuationToken);
+            setReady(true);
+          }
+        );
+      };
+
+      fetchContent(continuationToken);
+    },
+    [currentPrefixes, bucketName]
+  );
 
   useEffect(() => {
     const parsed = QueryString.parse(search);
@@ -70,18 +80,18 @@ export function BucketContent(props) {
     setBucketName(bucketNameParams);
     setCurrentPrefixes("");
     setFilterText("");
-    setGrepText("")
+    setGrepText("");
   }, [bucketNameParams]);
 
   useEffect(() => {
-    memoizedFetchContent(continuationTokenFromQuery)
-  }, [continuationTokenFromQuery,memoizedFetchContent]);
+    memoizedFetchContent(continuationTokenFromQuery);
+  }, [continuationTokenFromQuery, memoizedFetchContent]);
 
   useEffect(() => {
     if (bucketName === undefined) {
       return;
     }
-    memoizedFetchContent("")
+    memoizedFetchContent("");
   }, [currentPrefixes, bucketName, memoizedFetchContent]);
 
   if (bucketName === undefined) {
@@ -118,8 +128,12 @@ export function BucketContent(props) {
               onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)}
               baseUri={baseUri}
               continuationToken={continuationTokenFromResponse}
-              onGrepTextChange={(text) => { setGrepText(text)}}
-              onFilterTextChange={(text) => { setFilterText(text)}}
+              onGrepTextChange={(text) => {
+                setGrepText(text);
+              }}
+              onFilterTextChange={(text) => {
+                setFilterText(text);
+              }}
             />
           </Col>
         </Row>
@@ -145,75 +159,78 @@ export function BucketContent(props) {
                 ""
               )}
 
-              {prefixes.filter((prefix) => {
-                if(!filterText.length) return true;
-                return prefix.includes(filterText)
-              }).map((prefix) => (
-                <tr>
-                  <td>
-                    <PrefixLink
-                      bucketName={bucketName}
-                      prefix={prefix}
-                      currentPrefixes={currentPrefixes}
-                      onClick={(evt) => {
-                        addPrefix(prefix);
-                      }}
-                      baseUri={baseUri}
-                    />
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td>
-                  <PrefixLink
-                      bucketName={bucketName}
-                      prefix={prefix}
-                      currentPrefixes={currentPrefixes}
-                      onClick={(evt) => {
-                        addPrefix(prefix);
-                      }}
-                      baseUri={baseUri}
-                      displayText={<BsFolder/>}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {prefixes
+                .filter((prefix) => {
+                  if (!filterText.length) return true;
+                  return prefix.includes(filterText);
+                })
+                .map((prefix) => (
+                  <tr>
+                    <td>
+                      <PrefixLink
+                        bucketName={bucketName}
+                        prefix={prefix}
+                        currentPrefixes={currentPrefixes}
+                        onClick={(evt) => {
+                          addPrefix(prefix);
+                        }}
+                        baseUri={baseUri}
+                      />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <PrefixLink
+                        bucketName={bucketName}
+                        prefix={prefix}
+                        currentPrefixes={currentPrefixes}
+                        onClick={(evt) => {
+                          addPrefix(prefix);
+                        }}
+                        baseUri={baseUri}
+                        displayText={<BsFolder />}
+                      />
+                    </td>
+                  </tr>
+                ))}
 
-              {contents.filter((row) => {
-                if(!filterText.length) return true;
-                return row.friendlyName.includes(filterText)
-              }).map((row) => (
-                <tr>
-                  <td>{row.friendlyName}</td>
-                  <td>{row.lastUpdate}</td>
-                  <td>{row.size}</td>
-                  <td>
-                    <DownloadLink
-                      bucketName={bucketName}
-                      objectKey={row.key}
-                      friendlyName={row.friendlyName}
-                    />{' '}
-                    <PeekLink
-                      bucketName={bucketName}
-                      objectKey={row.key}
-                      friendlyName={row.friendlyName}
-                    />{' '}
-                    <GrepDownloadLink
-                      bucketName={bucketName}
-                      objectKey={row.key}
-                      friendlyName={row.friendlyName}
-                      text={grepText}
-                    />
-                    {' '}
-                    <GrepDownloadLink
-                      bucketName={bucketName}
-                      objectKey={row.key}
-                      friendlyName={row.friendlyName}
-                      text={grepText}
-                      historical={true}
-                    />                    
-                  </td>
-                </tr>
-              ))}
+              {contents
+                .filter((row) => {
+                  if (!filterText.length) return true;
+                  return row.friendlyName.includes(filterText);
+                })
+                .map((row) => (
+                  <tr>
+                    <td>{row.friendlyName}</td>
+                    <td>{row.lastUpdate}</td>
+                    <td>{row.size}</td>
+                    <td>
+                      <DownloadLink
+                        bucketName={bucketName}
+                        objectKey={row.key}
+                        friendlyName={row.friendlyName}
+                      />{" "}
+                      <PeekLink
+                        bucketName={bucketName}
+                        objectKey={row.key}
+                        friendlyName={row.friendlyName}
+                      />{" "}
+                      <GrepDownloadLink
+                        bucketName={bucketName}
+                        objectKey={row.key}
+                        friendlyName={row.friendlyName}
+                        text={grepText}
+                      />{" "}
+                      <GrepDownloadLink
+                        bucketName={bucketName}
+                        objectKey={row.key}
+                        friendlyName={row.friendlyName}
+                        text={grepText}
+                        historical={true}
+                      />
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </Row>
@@ -256,21 +273,28 @@ function DownloadLink(props) {
     });
   }
 
-  return <Button onClick={download} title="Download this file"><BsCloudDownload/></Button>;
+  return (
+    <Button onClick={download} title="Download this file">
+      <BsCloudDownload />
+    </Button>
+  );
 }
 
 function GrepDownloadLink(props) {
-  const historical = props.historical ? 'history' : ''
+  const historical = props.historical ? "history" : "";
 
   function download() {
-    const path = [
-      "",
-      "s3",
-      encodeURIComponent(props.bucketName),
-      encodeURIComponent(props.objectKey),
-      "grep",
-      historical
-    ].join("/") + '?text=' + encodeURIComponent(props.text);
+    const path =
+      [
+        "",
+        "s3",
+        encodeURIComponent(props.bucketName),
+        encodeURIComponent(props.objectKey),
+        "grep",
+        historical,
+      ].join("/") +
+      "?text=" +
+      encodeURIComponent(props.text);
     getStream(path).then((blob) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -280,9 +304,19 @@ function GrepDownloadLink(props) {
     });
   }
 
-  const icon = historical ? <BsCalendar/> : <BsFileEarmarkCheck/>
-  const title = historical ? "Download all lines containing the Grep text through the latest versions of this file": "Download all lines containing the Grep text"
-  return <Button disabled={props.text.length === 0} onClick={download} title="Download all lines containing the Grep text">{icon}</Button>;
+  const icon = historical ? <BsCalendar /> : <BsFileEarmarkCheck />;
+  const title = historical
+    ? "Download all lines containing the Grep text through the latest versions of this file"
+    : "Download all lines containing the Grep text";
+  return (
+    <Button
+      disabled={props.text.length === 0}
+      onClick={download}
+      title="Download all lines containing the Grep text"
+    >
+      {icon}
+    </Button>
+  );
 }
 
 function PeekLink(props) {
@@ -303,7 +337,11 @@ function PeekLink(props) {
     });
   }
 
-  return <Button onClick={download} title="Download the first 256KB of this file"><BsEye/></Button>;
+  return (
+    <Button onClick={download} title="Download the first 256KB of this file -">
+      <BsEye />
+    </Button>
+  );
 }
 
 function BackLink(props) {
@@ -328,7 +366,7 @@ function PrefixLink(props) {
   const newPrefixes = currentPrefixes ? currentPrefixes.split("|") : [];
   newPrefixes.push(prefix);
 
-  const display = displayText ? displayText : (prefix.length ? prefix : "..")
+  const display = displayText ? displayText : prefix.length ? prefix : "..";
   const uri =
     `/${props.baseUri}/` +
     bucketName +
@@ -346,22 +384,27 @@ export function BrowseBucketHeader(props) {
   const { bucketName, continuationToken } = props;
   const prefixes = props.currentPrefixes.split("|");
 
-  const prefixButtons = [{
+  const prefixButtons = [
+    {
       link: ["", props.baseUri, bucketName].join("/"),
       text: bucketName,
       prefixes: "",
-    }].concat(prefixes
-    .map((v, i, arr) => {
-      return arr.filter((_v, _i) => _i <= i);
-    })
-    .map((c) => {
-      const prefixes = c.join("|");
-      return {
-        link: ["", props.baseUri, bucketName, prefixes].join("/"),
-        text: c.slice(-1).pop(),
-        prefixes,
-      };
-    }))
+    },
+  ]
+    .concat(
+      prefixes
+        .map((v, i, arr) => {
+          return arr.filter((_v, _i) => _i <= i);
+        })
+        .map((c) => {
+          const prefixes = c.join("|");
+          return {
+            link: ["", props.baseUri, bucketName, prefixes].join("/"),
+            text: c.slice(-1).pop(),
+            prefixes,
+          };
+        })
+    )
     .map((c, key) => {
       return (
         <Breadcrumb.Item key>
@@ -379,8 +422,22 @@ export function BrowseBucketHeader(props) {
 
   const prefixPath = <Breadcrumb>{prefixButtons}</Breadcrumb>;
 
-  const searchInListTextBox = <Form.Control placeholder="Filter by name" onChange={(evt) => { props.onFilterTextChange(evt.target.value)}} />
-  const grepTextBox = <Form.Control placeholder="Grep text" onChange={(evt) => { props.onGrepTextChange(evt.target.value)}} />
+  const searchInListTextBox = (
+    <Form.Control
+      placeholder="Filter by name"
+      onChange={(evt) => {
+        props.onFilterTextChange(evt.target.value);
+      }}
+    />
+  );
+  const grepTextBox = (
+    <Form.Control
+      placeholder="Grep text"
+      onChange={(evt) => {
+        props.onGrepTextChange(evt.target.value);
+      }}
+    />
+  );
   const nextPage = continuationToken === "" || (
     <Link
       to={
@@ -395,9 +452,7 @@ export function BrowseBucketHeader(props) {
 
   return (
     <Navbar>
-      <Nav className="mr-auto">
-        {prefixPath}
-      </Nav>
+      <Nav className="mr-auto">{prefixPath}</Nav>
       <Form inline>
         {searchInListTextBox}
         {grepTextBox}

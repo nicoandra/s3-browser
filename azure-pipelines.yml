@@ -1,6 +1,3 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 
@@ -11,24 +8,43 @@ pr:
 - main
 - azure-pipeline
 
-
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
-
-- script: |
-    cd frontend
-    npm install
-    npm run build
-  displayName: 'FrontEnd - Install and Build'
-
-- script: |
-    cd backend
-    npm install
-    npm run build
-  displayName: 'BackEnd - Install and Build'
+stages:
+  - stage: 'InstallOS'
+    jobs:
+    - job: "InstallOS"
+      steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+          displayName: 'Install Node.js'
+  - stage: 'BuildFrontEnd'
+    jobs:
+    - template: '.pipeline/job_checkchanges.yml'
+      parameters:
+        path: 'frontend/'
+    - job: Build       
+      displayName: 'Only when source code changed'    
+      dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
+      condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
+      steps:
+      - script: |
+          cd frontend
+          echo "Build Succeess!"
+        displayName: 'FrontEnd - Install and Build'
+  - stage: 'BuildFrontEnd'
+    jobs:
+    - template: '.pipeline/job_checkchanges.yml'
+      parameters:
+        path: 'backend/'
+    - job: Build       
+      displayName: 'Only when source code changed'    
+      dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
+      condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
+      steps:
+      - script: |
+          cd backend
+          echo "Build Succeess!"
+        displayName: 'Backend - Install and Build'        

@@ -24,7 +24,7 @@ stages:
     jobs:
     - template: '.pipeline/job_checkchanges.yml'
       parameters:
-      - path: 'frontend/'
+        path: 'frontend/'
     - job: Build       
       displayName: 'Only when source code changed'    
       dependsOn: CheckChanges # <- Important: Mark previous job as dependency        

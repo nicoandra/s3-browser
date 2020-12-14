@@ -11,7 +11,7 @@ pr:
 pool:
   vmImage: 'ubuntu-latest'
 
-- stages:
+stages:
   - stage: 'Install OS'
     jobs:
     - job: "Install OS"

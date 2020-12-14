@@ -1,6 +1,3 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
@@ -15,14 +12,47 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    cd frontend
-    npm install
-    npm run build
-  displayName: 'FrontEnd - Install and Build'
 
-- script: |
-    cd backend
-    npm install
-    npm run build
-  displayName: 'BackEnd - Install and Build'
+- stages:
+  - stage: 'Build'
+    jobs:
+    - job: CheckChanges
+      displayName: 'Check changes'
+      steps:
+      - bash: |
+          PATH_FILTER="frontend/"
+          CHANGED_FILES=$(git diff HEAD HEAD~ --name-only)
+          MATCH_COUNT=0
+
+          echo "Checking for file changes..."
+          for FILE in $CHANGED_FILES
+          do
+            if [[ $FILE == *$PATH_FILTER* ]]; then
+              echo "MATCH:  ${FILE} changed"
+              MATCH_FOUND=true
+              MATCH_COUNT=$(($MATCH_COUNT+1))
+            else
+              echo "IGNORE: ${FILE} changed"
+            fi
+          done
+
+          echo "$MATCH_COUNT match(es) for filter '$PATH_FILTER' found."
+          if [[ $MATCH_COUNT -gt 0 ]]; then
+            echo "##vso[task.setvariable variable=SOURCE_CODE_CHANGED;isOutput=true]true"
+          else
+            echo "##vso[task.setvariable variable=SOURCE_CODE_CHANGED;isOutput=true]false"
+          fi
+        name: check_changes
+        displayName: 'Check changed files'
+
+    - job: Build       
+      displayName: 'Only when source code changed'    
+      dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
+      condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
+      steps:
+      - script: |
+          cd frontend
+          npm install
+          npm run build
+        displayName: 'FrontEnd - Install and Build'
+            

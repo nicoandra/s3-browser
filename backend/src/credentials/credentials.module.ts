@@ -7,6 +7,6 @@ import { CredentialsService } from './credentials.service';
   imports: [forwardRef(() => S3Module)],
   controllers: [CredentialsController],
   providers: [CredentialsService],
-  exports: [CredentialsService]
+  exports: [CredentialsService],
 })
 export class CredentialsModule {}

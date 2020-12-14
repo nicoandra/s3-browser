@@ -1,39 +1,54 @@
-import './App.css';
-import {Credentials} from './credentials/Index'
-import {List} from './browse/List'
-import {BrowseBucket} from './browse/BrowseBucket'
+import "./App.css";
+import { Credentials } from "./credentials/Index";
+import { BucketList } from "./browse/BucketList";
+import { BucketContent } from "./browse/BucketContent";
+import { BucketBrowser } from "./browse/BucketBrowser";
 
-import {
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+import Container from "react-bootstrap/Container";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import Row from "react-bootstrap/Row";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import { Switch, Route, Link } from "react-router-dom";
 
 function App() {
   return (
-      <div className="App">
-        <header className="App-header">
-          <Link to="/">S3 Browser</Link>
-        </header>
-        <nav>
-          <ul>
-            <li><Link to="/credentials">Set Credentials</Link></li>
-            <li><Link to="/browse">Browse Buckets</Link></li>
-          </ul>
-        </nav>
-        <main className="App-main">
-          <Switch>
-            <Route exact path="/" render={()=>{ return "Thanks for setting this up"}} />
-            <Route exact path="/credentials" component={Credentials} />
-            <Route exact path="/browse" component={List} />
-            <Route path="/browse/:bucketName/:prefixes?" component={BrowseBucket} />
-          </Switch>
-        </main>
-        <footer className="App-footer">
-          <div><a href="https://github.com/nicoandra/s3browser/">Source</a></div>
-        </footer>
-      </div>
+    <Container fluid={true}>
+      <Navbar bg="light" expand="lg" className="App-header">
+        <Navbar.Brand>
+          <Link to="/browse">Browse Buckets</Link>
+        </Navbar.Brand>
+        <Nav.Link>
+          <Link to="/credentials">Set Credentials</Link>
+        </Nav.Link>
+      </Navbar>
+      
+      <Container fluid={true} className="" as="main">
+        <Switch>
+          <Route
+            exact
+            path="/"
+            render={() => {
+              return "Thanks for setting this up";
+            }}
+          />
+          <Route exact path="/credentials" component={Credentials} />
+          <Route
+            path="/browse/:bucketName/:prefixes?"
+            component={BucketBrowser}
+          />
+          <Route exact path="/browse" component={BucketBrowser} />
+        </Switch>
+      </Container>
+
+      <Row as="footer" className="footer">
+        <Container>
+          <a href="https://github.com/nicoandra/s3browser/">Source</a>
+        </Container>
+      </Row>
+    </Container>
   );
 }
 

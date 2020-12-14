@@ -5,7 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors()
+  app.enableCors();
 
   const options = new DocumentBuilder()
     .setTitle('S3 Browser')
@@ -15,8 +15,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('doc', app, document);
-  
-  
+
   await app.listen(3000);
 }
 

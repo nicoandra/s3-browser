@@ -6,7 +6,7 @@ jobs:
   displayName: 'Check changes'
   steps:
   - bash: |
-      PATH_FILTER="${{ parameters.path }}/"
+      PATH_FILTER="${{ parameters.path }}"
       CHANGED_FILES=$(git diff HEAD HEAD~ --name-only)
       MATCH_COUNT=0
 

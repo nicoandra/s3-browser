@@ -338,7 +338,7 @@ function PeekLink(props) {
   }
 
   return (
-    <Button onClick={download} title="Download the first 256KB of this file">
+    <Button onClick={download} title="Download the first 256KB of this file -">
       <BsEye />
     </Button>
   );

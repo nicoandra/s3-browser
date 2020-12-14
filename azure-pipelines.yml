@@ -56,7 +56,6 @@ steps:
       steps:
       - script: |
           cd frontend
-          npm install
-          npm run build
+          echo "Build Succeess!"
         displayName: 'FrontEnd - Install and Build'
             

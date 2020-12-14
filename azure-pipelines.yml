@@ -16,7 +16,6 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-
 - stages:
   - stage: 'Build'
     jobs:

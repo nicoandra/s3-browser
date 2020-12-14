@@ -8,7 +8,6 @@ pr:
 - main
 - azure-pipeline
 
-
 pool:
   vmImage: 'ubuntu-latest'
 

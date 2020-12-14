@@ -1,7 +1,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
-import { GetAWSS3ObjectDto, ListAWSS3BucketObjectsDto } from './dto';
+import * as readline from 'readline';
+import { AWSS3ObjectVersionDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, ListAWSS3BucketObjectsDto } from './dto';
 
 @Injectable()
 export class S3Service {
@@ -59,9 +60,32 @@ export class S3Service {
     });
   }
 
+  async getObjectVersions(params: GetAWSS3ObjectDto): Promise<AWSS3ObjectVersionDto[]> {
+    this.getClient();
+    return new Promise((ok, ko) => {
+      const s3Params = params.toAwsGetObjectVersionsRequest();
+      this.s3Client.listObjectVersions(
+        s3Params,
+        (err: AWS.AWSError, data: AWS.S3.ListObjectVersionsOutput) => {
+          if (err) return ko(err);
+          return ok(data);
+        },
+      );
+    }).then((data: AWS.S3.ListObjectVersionsOutput) => {
+      return AWSS3ObjectVersionDto.fromAWSS3ListObjectVersionsOutput(data)
+    });
+  }
+
   getObjectReadStream(params: GetAWSS3ObjectDto) {
     this.getClient();
     const s3Params = params.toAwsGetObjectRequest();
     return this.s3Client.getObject(s3Params).createReadStream();
+  }
+
+  getObjectReadLineInterface(params: GetAWSS3ObjectDto) {
+    return readline.createInterface({
+      input: this.getObjectReadStream(params),
+      terminal: false
+    });
   }
 }

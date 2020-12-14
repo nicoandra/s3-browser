@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { bool } from 'aws-sdk/clients/signer';
 
 export class SetCredentialsRequestDto {
   @ApiProperty() region: string;
@@ -107,6 +108,7 @@ export class GetAWSS3ObjectDto {
   bucket: string;
   byteRangeStart?: number
   byteRangeEnd?: number
+  versionId?: string
 
   toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
     const result = {
@@ -117,6 +119,20 @@ export class GetAWSS3ObjectDto {
     if (this.byteRangeEnd !== undefined && this.byteRangeStart !== undefined && (this.byteRangeStart < this.byteRangeEnd)) {
         result["Range"] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`
     }
+
+    if (this.versionId !== undefined) {
+      result["VersionId"] = this.versionId
+    }
+    return result;
+  }
+
+  toAwsGetObjectVersionsRequest(): AWS.S3.ListObjectVersionsRequest {
+    const result = {
+      Bucket: this.bucket,
+      Prefix: this.key,
+      MaxKeys: 5
+    };
+
     return result;
   }
 }
@@ -133,5 +149,34 @@ export class GetObjectDto {
     result.headers = headers;
     result.readStream = response.readStream;
     return result;
+  }
+}
+
+export class GetAWSS3ObjectVersionsDto {
+    key: string;
+    bucket: string;
+}
+
+export class AWSS3ObjectVersionDto {
+  key: string
+  versionId: string
+  isLatest: bool
+  updatedAt: Date
+
+  static fromAWSS3ListObjectVersionsOutput(data: AWS.S3.ListObjectVersionsOutput) : AWSS3ObjectVersionDto[] {
+    return data.Versions.map((v: AWS.S3.ObjectVersion) => {
+      const result = new AWSS3ObjectVersionDto()
+      result.key = v.Key
+      result.versionId = v.VersionId
+      result.isLatest = v.IsLatest
+      result.updatedAt = v.LastModified
+      return result
+    }).sort((a,b) => {
+      switch(true) {
+        case (a.updatedAt > b.updatedAt): return -1
+        case (a.updatedAt < b.updatedAt): return 1
+        default: return 0
+      }
+    })
   }
 }

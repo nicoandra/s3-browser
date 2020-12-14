@@ -13,6 +13,7 @@ export class CredentialsService {
   constructor(
     @Inject(forwardRef(() => S3Service)) private s3Service: S3Service,
   ) {
+    console.log("THESE CREDS", CredentialsService.credentials)
   }
 
   save(payload: SetCredentialsRequestDto): CredentialsDto {

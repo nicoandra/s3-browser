@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { get, getStream } from "./../common";
 import { Link, useParams, useLocation } from "react-router-dom";
-import { BsCloudDownload, BsFolder, BsFileEarmarkCheck, BsEye } from 'react-icons/bs'
+import { BsCloudDownload, BsFolder, BsFileEarmarkCheck, BsEye, BsCalendar } from 'react-icons/bs'
 import {
   Row,
   Col,
@@ -203,6 +203,14 @@ export function BucketContent(props) {
                       objectKey={row.key}
                       friendlyName={row.friendlyName}
                       text={grepText}
+                    />
+                    {' '}
+                    <GrepDownloadLink
+                      bucketName={bucketName}
+                      objectKey={row.key}
+                      friendlyName={row.friendlyName}
+                      text={grepText}
+                      historical={true}
                     />                    
                   </td>
                 </tr>
@@ -253,6 +261,8 @@ function DownloadLink(props) {
 }
 
 function GrepDownloadLink(props) {
+  const historical = props.historical ? 'history' : ''
+
   function download() {
     const path = [
       "",
@@ -260,6 +270,7 @@ function GrepDownloadLink(props) {
       encodeURIComponent(props.bucketName),
       encodeURIComponent(props.objectKey),
       "grep",
+      historical
     ].join("/") + '?text=' + encodeURIComponent(props.text);
     getStream(path).then((blob) => {
       const url = window.URL.createObjectURL(blob);
@@ -270,7 +281,9 @@ function GrepDownloadLink(props) {
     });
   }
 
-  return <Button disabled={props.text.length === 0} onClick={download} title="Download all lines containing the Grep text"><BsFileEarmarkCheck/></Button>;
+  const icon = historical ? <BsCalendar/> : <BsFileEarmarkCheck/>
+  const title = historical ? "Download all lines containing the Grep text through the latest versions of this file": "Download all lines containing the Grep text"
+  return <Button disabled={props.text.length === 0} onClick={download} title="Download all lines containing the Grep text">{icon}</Button>;
 }
 
 function PeekLink(props) {

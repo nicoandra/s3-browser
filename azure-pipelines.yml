@@ -11,13 +11,15 @@ pr:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
-
 - stages:
+  - stage: 'Install OS'
+    jobs:
+    - job: "Install OS"
+      steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '10.x'
+          displayName: 'Install Node.js'
   - stage: 'Build FrontEnd'
     jobs:
     - job: CheckChanges
@@ -58,4 +60,3 @@ steps:
           cd frontend
           echo "Build Succeess!"
         displayName: 'FrontEnd - Install and Build'
-            

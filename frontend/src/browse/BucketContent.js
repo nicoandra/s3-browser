@@ -18,7 +18,9 @@ import {
   Spinner,
   Form,
   Button,
+  Container
 } from "react-bootstrap";
+import * as prettyBytes from 'pretty-bytes'
 import * as QueryString from "query-string";
 
 export function BucketContent(props) {
@@ -48,8 +50,6 @@ export function BucketContent(props) {
 
   const memoizedFetchContent = useCallback(
     (continuationToken) => {
-
-
       if(!bucketName) {
         return ;
       }
@@ -100,15 +100,11 @@ export function BucketContent(props) {
   }, [currentPrefixes, bucketName, memoizedFetchContent]);
 
 
-  const classNames = [props.className, 'bucket-content'].join(' ')
+  const classNames = ['vh-100', 'd-flex align-items-center justify-content-center'].join(' ')
 
   if (bucketName === undefined || !ready) {
     const content = bucketName === undefined ? <span class="align-middle">Pick a bucket</span> : <Spinner animation="border" variant="primary" />
-    return (<Row className={classNames}>
-          <Col>
-            {content}
-          </Col>
-      </Row>);
+    return (<Container className={classNames}>{content}</Container>);
   }
 
   const backLink = (
@@ -121,7 +117,8 @@ export function BucketContent(props) {
   );
 
   return (
-    <Row className={classNames}>
+    <Container>
+    <Row className={'vh-100 d-flex'}>
       <Col>
         <Row>
           <Col>
@@ -206,7 +203,7 @@ export function BucketContent(props) {
                   <tr>
                     <td>{row.friendlyName}</td>
                     <td>{row.lastUpdate}</td>
-                    <td>{row.size}</td>
+                    <td><span alt={row.size}>{prettyBytes(row.size)}</span></td>
                     <td>
                       <DownloadLink
                         bucketName={bucketName}
@@ -239,6 +236,7 @@ export function BucketContent(props) {
         </Row>
       </Col>
     </Row>
+    </Container>
   );
 
   function removeLastPrefix() {

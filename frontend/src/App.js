@@ -1,6 +1,7 @@
 import "./App.css";
 import { Credentials } from "./credentials/Index";
 import { BucketBrowser } from "./browse/BucketBrowser";
+import { Home } from "./home/Home";
 
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
@@ -14,7 +15,7 @@ import { Switch, Route, Link } from "react-router-dom";
 function App() {
   return (
     <Container fluid={true}>
-      <Navbar bg="light" expand="lg" className="App-header">
+      <Navbar bg="primary" variant="dark" expand="lg" className="App-header vh-5">
         <Navbar.Brand>
           <Link to="/browse">Browse Buckets</Link>
         </Navbar.Brand>
@@ -23,14 +24,12 @@ function App() {
         </Nav.Link>
       </Navbar>
 
-      <Container fluid={true} className="" as="main">
+      <Container fluid={true} className="vh-90" as="main">
         <Switch>
           <Route
             exact
             path="/"
-            render={() => {
-              return "Thanks for setting this up";
-            }}
+            component={Home}
           />
           <Route exact path="/credentials" component={Credentials} />
           <Route
@@ -41,7 +40,7 @@ function App() {
         </Switch>
       </Container>
 
-      <Row as="footer" className="footer">
+      <Row as="footer" className="footer vh-5">
         <Container>
           <a href="https://github.com/nicoandra/s3browser/">Source</a>
         </Container>

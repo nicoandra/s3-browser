@@ -22,7 +22,7 @@ export function BucketList(props) {
 
   if (!ready) {
     return (
-      <Container className={"align-middle " + props.className + " overflow-auto bucket-list"}>
+      <Container>
         <Row>
           <Col>
             <Spinner animation="border" variant="primary" />
@@ -35,7 +35,7 @@ export function BucketList(props) {
   return (
     <Nav
       defaultActiveKey="/home"
-      className="flex-column col-md-2 d-none d-md-block bg-light sidebar overflow-auto bucket-list"
+      className={"flex-column col-md-2 d-none d-md-block bg-light sidebar overflow-auto"}
     >
       <Form>
         <Form.Control

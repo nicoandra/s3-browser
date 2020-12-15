@@ -19,12 +19,10 @@ export function BucketBrowser(props) {
     <Row className="h-100">
       <BucketList
         onBucketSelectionChange={bucketSelectionHandler}
-        className="col-md-1"
       />
       <BucketContent
         bucketName={activeBucketName}
         prefixes={currentPrefixesParams}
-        className="col-md-10"
       />
     </Row>
   );

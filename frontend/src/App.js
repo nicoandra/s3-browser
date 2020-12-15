@@ -1,21 +1,18 @@
 import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Switch, Route, Link } from "react-router-dom";
+import Container from "react-bootstrap/Container";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+
 import { Credentials } from "./credentials/Index";
 import { BucketBrowser } from "./browse/BucketBrowser";
 import { Home } from "./home/Home";
 
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import Row from "react-bootstrap/Row";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import { Switch, Route, Link } from "react-router-dom";
-
 function App() {
   return (
     <Container fluid={true} className="p-0">
-      <Navbar bg="primary" variant="dark" expand="lg" className="App-header vh-5">
+      <Navbar bg="primary" variant="dark" expand="lg" className="App-header vh-5" sticky="top">
         <Navbar.Brand>
           <Link to="/browse">Browse Buckets</Link>
         </Navbar.Brand>
@@ -39,13 +36,14 @@ function App() {
           <Route exact path="/browse" component={BucketBrowser} />
         </Switch>
       </Container>
-
-      <Row as="footer" className="footer vh-5">
-        <Container fluid>
-          <a href="https://github.com/nicoandra/s3browser/">Source</a>
-        </Container>
-      </Row>
+      <Navbar bg="secondary" variant="light" className="App-footer vh-5" sticky="bottom" expand="false">
+        <Nav.Link>
+          <Link to="https://github.com/nicoandra/s3-browser">Source code</Link>
+        </Nav.Link>
+      </Navbar>
     </Container>
+
+    
   );
 }
 

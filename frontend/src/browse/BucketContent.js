@@ -45,7 +45,7 @@ export function BucketContent(props) {
     continuationTokenFromQuery,
     setContinuationTokenFromQuery,
   ] = useState();
-  const baseUri = props.baseUri || "browse";
+  const baseUri = "browse";
   const [ready, setReady] = useState(false);
 
   const memoizedFetchContent = useCallback(
@@ -408,7 +408,7 @@ export function BrowseBucketHeader(props) {
     )
     .map((c, key) => {
       return (
-        <Breadcrumb.Item key>
+        <Breadcrumb.Item key={key}>
           <Link
             to={c.link}
             onClick={() => {

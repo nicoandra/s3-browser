@@ -25,28 +25,19 @@ stages:
     - template: '.pipeline/job_check_changes.yml'
       parameters:
         path: 'frontend/'
-    - job: Build       
-      displayName: 'Only when source code changed'    
-      dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
-      condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
-      steps:
-      - script: |
-          cd frontend
-          npm install
-          npm run test
-          echo "Build Success!"
-        displayName: 'FrontEnd - Install and Build'
-  - stage: 'BuildBackEnd'
-    jobs:
-    - template: '.pipeline/job_checkchanges.yml'
+    - template: '.pipeline/job_npm_install.yml'
       parameters:
-        path: 'backend/'
-    - job: Build       
-      displayName: 'Only when source code changed'    
+        path: 'frontend/'
       dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
       condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
-      steps:
-      - script: |
-          cd backend
-          echo "Build Success!"
-        displayName: 'Backend - Install and Build'        
+  - stage: 'BuildBackEnd'
+      jobs:
+      - template: '.pipeline/job_check_changes.yml'
+        parameters:
+          path: 'backend/'
+      - template: '.pipeline/job_npm_install.yml'
+        parameters:
+          path: 'backend/'
+        dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
+        condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
+        

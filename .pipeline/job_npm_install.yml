@@ -1,0 +1,12 @@
+parameters:
+  path: ''
+
+jobs:
+- job: NpmInstall
+  displayName: 'npm install'
+  steps:
+  - bash: |
+      cd "${{ parameters.path }}"
+      npm install
+    name: npm_install
+    displayName: 'Install NPM dependencies'

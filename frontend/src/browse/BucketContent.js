@@ -12,7 +12,6 @@ import {
   Row,
   Col,
   Navbar,
-  Badge,
   Nav,
   Table,
   Breadcrumb,
@@ -35,7 +34,7 @@ export function BucketContent(props) {
   const [currentPrefixes, setCurrentPrefixes] = useState(
     currentPrefixesParams || ""
   );
-  const [bucketName, setBucketName] = useState(bucketNameParams);
+  const [bucketName, setBucketName] = useState(bucketNameParams || '');
   const [
     continuationTokenFromResponse,
     setContinuationTokenFromResponse,
@@ -49,6 +48,12 @@ export function BucketContent(props) {
 
   const memoizedFetchContent = useCallback(
     (continuationToken) => {
+
+
+      if(!bucketName) {
+        return ;
+      }
+
       const fetchContent = (continuationToken) => {
         setReady(false);
         let prefixesUri = currentPrefixes?.split("/").join("|");
@@ -94,8 +99,16 @@ export function BucketContent(props) {
     memoizedFetchContent("");
   }, [currentPrefixes, bucketName, memoizedFetchContent]);
 
-  if (bucketName === undefined) {
-    return <div>Pick a bucket</div>;
+
+  const classNames = [props.className, 'bucket-content'].join(' ')
+
+  if (bucketName === undefined || !ready) {
+    const content = bucketName === undefined ? <span class="align-middle">Pick a bucket</span> : <Spinner animation="border" variant="primary" />
+    return (<Row className={classNames}>
+          <Col>
+            {content}
+          </Col>
+      </Row>);
   }
 
   const backLink = (
@@ -107,18 +120,8 @@ export function BucketContent(props) {
     />
   );
 
-  if (!ready) {
-    return (
-      <Row className={props.className}>
-        <Col>
-          <Spinner animation="border" variant="primary" />
-        </Col>
-      </Row>
-    );
-  }
-
   return (
-    <Row className={props.className}>
+    <Row className={classNames}>
       <Col>
         <Row>
           <Col>
@@ -312,7 +315,7 @@ function GrepDownloadLink(props) {
     <Button
       disabled={props.text.length === 0}
       onClick={download}
-      title="Download all lines containing the Grep text"
+      title={title}
     >
       {icon}
     </Button>

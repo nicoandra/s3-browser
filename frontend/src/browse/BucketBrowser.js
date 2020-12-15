@@ -24,7 +24,7 @@ export function BucketBrowser(props) {
       <BucketContent
         bucketName={activeBucketName}
         prefixes={currentPrefixesParams}
-        className="col-xl-10"
+        className="col-md-9"
       />
     </Row>
   );

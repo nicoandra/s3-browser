@@ -16,6 +16,7 @@ The API can be accessed by default at http://0.0.0.0:3000/doc
 
 # To Do
 
+1. Ensure all methods are typed, no `any`.
 1. Increase code coverage
 1. Add code coverage check in the Pipeline
 1. Fix `npm build`

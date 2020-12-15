@@ -117,7 +117,7 @@ export function BucketContent(props) {
   );
 
   return (
-    <Container>
+    <Container fluid={true} className={'col-md-10 p-4'}>
     <Row className={'vh-100 d-flex'}>
       <Col>
         <Row>

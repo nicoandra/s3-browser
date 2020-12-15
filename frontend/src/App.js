@@ -14,7 +14,7 @@ import { Switch, Route, Link } from "react-router-dom";
 
 function App() {
   return (
-    <Container fluid={true}>
+    <Container fluid={true} className="p-0">
       <Navbar bg="primary" variant="dark" expand="lg" className="App-header vh-5">
         <Navbar.Brand>
           <Link to="/browse">Browse Buckets</Link>
@@ -41,7 +41,7 @@ function App() {
       </Container>
 
       <Row as="footer" className="footer vh-5">
-        <Container>
+        <Container fluid>
           <a href="https://github.com/nicoandra/s3browser/">Source</a>
         </Container>
       </Row>

@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { S3Module } from 'src/s3/s3.module';
+import { S3Module } from './../s3/s3.module';
 import { CredentialsController } from './credentials.controller';
 import { CredentialsService } from './credentials.service';
 

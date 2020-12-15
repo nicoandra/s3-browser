@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { forwardRef } from '@nestjs/common';
 import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
+import { CredentialsModule } from './../credentials/credentials.module';
 
 describe('S3Controller', () => {
   let controller: S3Controller;
@@ -10,6 +12,8 @@ describe('S3Controller', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [forwardRef(() => CredentialsModule)],
+
       controllers: [S3Controller],
       providers: [S3Service]
     }).compile();
@@ -22,9 +26,12 @@ describe('S3Controller', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should list buckets', () => {
-    jest.spyOn(service, 'listBuckets').mockImplementation(() => [{}]);
+  it('should list buckets', async () => {
+    jest.spyOn(service, 'listBuckets').mockImplementation(async () => { return [] });
+    const result = await controller.get()
+    expect(result).toEqual([]);
 
-    expect(controller).toBeDefined();
-  });  
+    jest.spyOn(service, 'listBuckets').mockImplementation(async () => [{name: "OneBucket", createdAt: new Date(2020, 1, 2, 3, 5, 6)}]);
+    expect(await controller.get()).toEqual([{name: "OneBucket", createdAt: new Date(2020, 1, 2, 3, 5, 6)}]);
+  });
 });

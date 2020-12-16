@@ -34,10 +34,12 @@ stages:
         path: 'frontend/'
     - job: RefTags
       condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+      steps:
       - bash: |
         echo "RefTags"
     - job: ReleasesTags
       condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
+      steps:
       - bash: |
         echo "ReleasesTags"        
   - stage: 'BuildBackEnd'
@@ -50,10 +52,12 @@ stages:
       path: 'frontend/'
     - job: RefTags
       condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+      steps:
       - bash: |
         echo "RefTags"
     - job: ReleasesTags
       condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
+      steps:
       - bash: |
         echo "ReleasesTags"       
       

@@ -43,6 +43,8 @@ stages:
       steps:
       - bash: |
           echo ReleasesTags
+          echo build.sourceBranch $build.sourceBranch
+          echo build.sourceBranch ${{ parameters.path }}
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'

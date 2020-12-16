@@ -53,18 +53,17 @@ export class GetBucketContentResponseDto {
   contents: BucketElementDto[];
   truncated: boolean = false;
   continuationToken: string = '';
-  delimiter: string = '/';
 
   static fromAwsResponse(
     response: AWS.S3.ListObjectsV2Output,
   ): GetBucketContentResponseDto {
     const result = new GetBucketContentResponseDto();
-    result.truncated = response.IsTruncated;
+    result.truncated = response.IsTruncated || false;
     result.prefixes = response.CommonPrefixes?.map(
       (entry: AWS.S3.CommonPrefix) => {
         return entry.Prefix.substring(response.Prefix?.length || 0);
       },
-    ).filter((s) => s.length > 0);
+    ).filter((s) => s.length > 0) || [];
 
     result.contents = response.Contents.map((row: AWS.S3.Object) =>
       BucketElementDto.fromAwsResponseContentRow(row, response.Prefix),
@@ -72,7 +71,7 @@ export class GetBucketContentResponseDto {
     result.continuationToken = response.NextContinuationToken || '';
     result.currentPrefixes = response.Prefix?.split(`/`).filter(
       (s) => s.length > 0,
-    );
+    ) || [];
     return result;
   }
 }

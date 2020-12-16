@@ -21,7 +21,7 @@ export class S3Controller {
     @Param('bucketName') bucketName: string,
     @Param('prefixes') prefixes: string,
     @Query() queryParams: GetBucketContentRequestDto,
-  ) {
+  ) : Promise<GetBucketContentResponseDto> {
     const params = GetBucketContentRequestDto.fromParams({
       bucketName,
       prefixes,

@@ -7,15 +7,16 @@ jobs:
   dependsOn: CheckChanges
   condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
-  - bash: |
+  - name: EnforceStandards
+    displayName: 'Enforce standards'
+    bash: |
       echo "Preparing ${{ parameters.path }}"
       cd ${{ parameters.path }}
       npm install
       npm run lint:check
       npm run test
-    name: EnforceStandards
-    displayName: 'Enforce standards'
-  - bash: |
-    npm run test:cov
-  name: CodeCoverage
-  displayName: 'Code Coverage'
+  - name: CodeCoverage
+    displayName: 'Code Coverage'
+    bash: |
+      npm run test:cov
+

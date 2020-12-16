@@ -57,7 +57,7 @@ stages:
         displayName: Build and Push
         inputs:
           command: buildAndPush
-          repository: s3-browser
+          repository: nicoandra/s3-browser
           tags: |
             $(build.sourceBranchName)
       - task: Docker@2

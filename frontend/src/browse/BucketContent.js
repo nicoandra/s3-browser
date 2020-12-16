@@ -18,9 +18,9 @@ import {
   Spinner,
   Form,
   Button,
-  Container
+  Container,
 } from "react-bootstrap";
-import * as prettyBytes from 'pretty-bytes'
+import * as prettyBytes from "pretty-bytes";
 import * as QueryString from "query-string";
 
 export function BucketContent(props) {
@@ -36,7 +36,7 @@ export function BucketContent(props) {
   const [currentPrefixes, setCurrentPrefixes] = useState(
     currentPrefixesParams || ""
   );
-  const [bucketName, setBucketName] = useState(bucketNameParams || '');
+  const [bucketName, setBucketName] = useState(bucketNameParams || "");
   const [
     continuationTokenFromResponse,
     setContinuationTokenFromResponse,
@@ -50,8 +50,8 @@ export function BucketContent(props) {
 
   const memoizedFetchContent = useCallback(
     (continuationToken) => {
-      if(!bucketName) {
-        return ;
+      if (!bucketName) {
+        return;
       }
 
       const fetchContent = (continuationToken) => {
@@ -99,12 +99,19 @@ export function BucketContent(props) {
     memoizedFetchContent("");
   }, [currentPrefixes, bucketName, memoizedFetchContent]);
 
-
-  const classNames = ['vh-100', 'd-flex align-items-center justify-content-center'].join(' ')
+  const classNames = [
+    "vh-100",
+    "d-flex align-items-center justify-content-center",
+  ].join(" ");
 
   if (bucketName === undefined || !ready) {
-    const content = bucketName === undefined ? <span class="align-middle">Pick a bucket</span> : <Spinner animation="border" variant="primary" />
-    return (<Container className={classNames}>{content}</Container>);
+    const content =
+      bucketName === undefined ? (
+        <span class="align-middle">Pick a bucket</span>
+      ) : (
+        <Spinner animation="border" variant="primary" />
+      );
+    return <Container className={classNames}>{content}</Container>;
   }
 
   const backLink = (
@@ -117,125 +124,129 @@ export function BucketContent(props) {
   );
 
   return (
-    <Container fluid={true} className={'col-md-10 p-4'}>
-    <Row className={'vh-100 d-flex'}>
-      <Col>
-        <Row>
-          <Col>
-            <BrowseBucketHeader
-              bucketName={bucketName}
-              currentPrefixes={currentPrefixes}
-              onCurrentPrefixChange={(prefixes) => setCurrentPrefixes(prefixes)}
-              baseUri={baseUri}
-              continuationToken={continuationTokenFromResponse}
-              onGrepTextChange={(text) => {
-                setGrepText(text);
-              }}
-              onFilterTextChange={(text) => {
-                setFilterText(text);
-              }}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Table className="table-striped table-md">
-            <thead>
-              <tr>
-                <th>Key</th>
-                <th>Last Update</th>
-                <th>Size</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {backLink ? (
+    <Container fluid={true} className={"col-md-10 p-4"}>
+      <Row className={"vh-100 d-flex"}>
+        <Col>
+          <Row>
+            <Col>
+              <BrowseBucketHeader
+                bucketName={bucketName}
+                currentPrefixes={currentPrefixes}
+                onCurrentPrefixChange={(prefixes) =>
+                  setCurrentPrefixes(prefixes)
+                }
+                baseUri={baseUri}
+                continuationToken={continuationTokenFromResponse}
+                onGrepTextChange={(text) => {
+                  setGrepText(text);
+                }}
+                onFilterTextChange={(text) => {
+                  setFilterText(text);
+                }}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Table className="table-striped table-md">
+              <thead>
                 <tr>
-                  <td>{backLink}</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+                  <th>Key</th>
+                  <th>Last Update</th>
+                  <th>Size</th>
+                  <th>Actions</th>
                 </tr>
-              ) : (
-                ""
-              )}
-
-              {prefixes
-                .filter((prefix) => {
-                  if (!filterText.length) return true;
-                  return prefix.includes(filterText);
-                })
-                .map((prefix) => (
+              </thead>
+              <tbody>
+                {backLink ? (
                   <tr>
-                    <td>
-                      <PrefixLink
-                        bucketName={bucketName}
-                        prefix={prefix}
-                        currentPrefixes={currentPrefixes}
-                        onClick={(evt) => {
-                          addPrefix(prefix);
-                        }}
-                        baseUri={baseUri}
-                      />
-                    </td>
+                    <td>{backLink}</td>
                     <td></td>
                     <td></td>
-                    <td>
-                      <PrefixLink
-                        bucketName={bucketName}
-                        prefix={prefix}
-                        currentPrefixes={currentPrefixes}
-                        onClick={(evt) => {
-                          addPrefix(prefix);
-                        }}
-                        baseUri={baseUri}
-                        displayText={<BsFolder />}
-                      />
-                    </td>
+                    <td></td>
                   </tr>
-                ))}
+                ) : (
+                  ""
+                )}
 
-              {contents
-                .filter((row) => {
-                  if (!filterText.length) return true;
-                  return row.friendlyName.includes(filterText);
-                })
-                .map((row) => (
-                  <tr>
-                    <td>{row.friendlyName}</td>
-                    <td>{row.lastUpdate}</td>
-                    <td><span alt={row.size}>{prettyBytes(row.size)}</span></td>
-                    <td>
-                      <DownloadLink
-                        bucketName={bucketName}
-                        objectKey={row.key}
-                        friendlyName={row.friendlyName}
-                      />{" "}
-                      <PeekLink
-                        bucketName={bucketName}
-                        objectKey={row.key}
-                        friendlyName={row.friendlyName}
-                      />{" "}
-                      <GrepDownloadLink
-                        bucketName={bucketName}
-                        objectKey={row.key}
-                        friendlyName={row.friendlyName}
-                        text={grepText}
-                      />{" "}
-                      <GrepDownloadLink
-                        bucketName={bucketName}
-                        objectKey={row.key}
-                        friendlyName={row.friendlyName}
-                        text={grepText}
-                        historical={true}
-                      />
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </Table>
-        </Row>
-      </Col>
-    </Row>
+                {prefixes
+                  .filter((prefix) => {
+                    if (!filterText.length) return true;
+                    return prefix.includes(filterText);
+                  })
+                  .map((prefix) => (
+                    <tr>
+                      <td>
+                        <PrefixLink
+                          bucketName={bucketName}
+                          prefix={prefix}
+                          currentPrefixes={currentPrefixes}
+                          onClick={(evt) => {
+                            addPrefix(prefix);
+                          }}
+                          baseUri={baseUri}
+                        />
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td>
+                        <PrefixLink
+                          bucketName={bucketName}
+                          prefix={prefix}
+                          currentPrefixes={currentPrefixes}
+                          onClick={(evt) => {
+                            addPrefix(prefix);
+                          }}
+                          baseUri={baseUri}
+                          displayText={<BsFolder />}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+
+                {contents
+                  .filter((row) => {
+                    if (!filterText.length) return true;
+                    return row.friendlyName.includes(filterText);
+                  })
+                  .map((row) => (
+                    <tr>
+                      <td>{row.friendlyName}</td>
+                      <td>{row.lastUpdate}</td>
+                      <td>
+                        <span alt={row.size}>{prettyBytes(row.size)}</span>
+                      </td>
+                      <td>
+                        <DownloadLink
+                          bucketName={bucketName}
+                          objectKey={row.key}
+                          friendlyName={row.friendlyName}
+                        />{" "}
+                        <PeekLink
+                          bucketName={bucketName}
+                          objectKey={row.key}
+                          friendlyName={row.friendlyName}
+                        />{" "}
+                        <GrepDownloadLink
+                          bucketName={bucketName}
+                          objectKey={row.key}
+                          friendlyName={row.friendlyName}
+                          text={grepText}
+                        />{" "}
+                        <GrepDownloadLink
+                          bucketName={bucketName}
+                          objectKey={row.key}
+                          friendlyName={row.friendlyName}
+                          text={grepText}
+                          historical={true}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
+          </Row>
+        </Col>
+      </Row>
     </Container>
   );
 
@@ -310,11 +321,7 @@ function GrepDownloadLink(props) {
     ? "Download all lines containing the Grep text through the latest versions of this file"
     : "Download all lines containing the Grep text";
   return (
-    <Button
-      disabled={props.text.length === 0}
-      onClick={download}
-      title={title}
-    >
+    <Button disabled={props.text.length === 0} onClick={download} title={title}>
       {icon}
     </Button>
   );

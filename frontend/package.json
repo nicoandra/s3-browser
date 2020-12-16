@@ -23,7 +23,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:cov": "jest --coverage"
+    "test:cov": "react-scripts test -- --coverage",
+    "lint:check": "prettier -c \"src/**/*.js\""
   },
   "eslintConfig": {
     "extends": [

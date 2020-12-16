@@ -14,8 +14,10 @@ pr:
 - azure-pipeline
 
 variables:
+- name: sourceBranch
+  value: $[variables['build.sourceBranch']]
 - name: isMainBranch
-  value: $[eq(variables['build.sourceBranch'], 'refs/heads/master')]
+  value: $[eq(variables['build.sourceBranch'], 'refs/heads/main')]
 - name: isTagRelease
   value: $[startsWith(variables['build.sourceBranch'], 'refs/tags/v')]
 - name: dockerImageName
@@ -31,6 +33,7 @@ stages:
     - job: "ShowVariables"
       steps:
       - bash: |
+          echo "sourceBranch: $(sourceBranch)"
           echo "isMainBranch: $(isMainBranch)"
           echo "isTagRelease: $(isTagRelease)"
           echo "dockerImageName: $(dockerImageName)"

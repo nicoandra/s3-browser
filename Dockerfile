@@ -30,7 +30,6 @@ COPY .extras/supervisor.conf /usr/src/app/supervisord.conf
 WORKDIR /usr/src/app
 
 ENV BACKEND_PORT=5000
-ENV FRONTEND_PORT=3000
 
 EXPOSE 3000
 EXPOSE 5000

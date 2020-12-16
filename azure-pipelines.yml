@@ -21,10 +21,10 @@ stages:
     jobs:
     - job: "InstallOS"
       steps:
-        - task: NodeTool@0
-          inputs:
-            versionSpec: '10.x'
-          displayName: 'Install Node.js'
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '10.x'
+        displayName: 'Install Node.js'
   - stage: 'BuildFrontEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'
@@ -33,13 +33,6 @@ stages:
     - template: '.pipeline/job_enforce_standards.yml'
       parameters:
         path: 'frontend/'
-    - job: RefTags
-      condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
-      steps:
-      - bash: |
-          echo RefTags
-          echo build.sourceBranch $build.sourceBranch
-          echo build.sourceBranch "$(build.sourceBranch)"
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'
@@ -48,5 +41,30 @@ stages:
     - template: '.pipeline/job_enforce_standards.yml'
       parameters:
         path: 'frontend/'    
+  - stage: 'DockerBuildAndPush'
+    jobs:
+    - job: RefTags
+      condition: startsWith(variables['build.sourceBranch'], 'refs/tags/v')
+      steps:
+      - bash: |
+          echo Building Docker Image for tag "$(build.sourceBranchName)"
+      - task: Docker@2
+        displayName: Login to DockerHub
+        inputs:
+          command: login
+          containerRegistry: "NicoAndra DockerHub"
+      - task: Docker@2
+        displayName: Build and Push
+        inputs:
+          command: buildAndPush
+          repository: s3-browser
+          tags: |
+            $(build.sourceBranchName)
+      - task: Docker@2
+        displayName: Logout from DockerHub
+        inputs:
+        command: logout
+        containerRegistry: "NicoAndra DockerHub"
+
       
         

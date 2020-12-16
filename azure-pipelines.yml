@@ -50,6 +50,6 @@ stages:
         path: 'backend/'
     - template: '.pipeline/enforce_standards.yml'
       parameters:
-      path: 'frontend/'    
+        path: 'frontend/'    
       
         

@@ -30,7 +30,7 @@ stages:
     - template: '.pipeline/job_check_changes.yml'
       parameters:
         path: 'frontend/'
-    - template: '.pipeline/enforce_standards.yml'
+    - template: '.pipeline/job_enforce_standards.yml'
       parameters:
         path: 'frontend/'
     - job: RefTags
@@ -48,7 +48,7 @@ stages:
     - template: '.pipeline/job_check_changes.yml'
       parameters:
         path: 'backend/'
-    - template: '.pipeline/enforce_standards.yml'
+    - template: '.pipeline/job_enforce_standards.yml'
       parameters:
         path: 'frontend/'    
       

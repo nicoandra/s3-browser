@@ -5,6 +5,7 @@ jobs:
 - job: NpmInstall
   displayName: 'npm install'
   dependsOn: CheckChanges
+  condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
   - bash: |
       cd "${{ parameters.path }}"

@@ -1,10 +1,11 @@
 parameters:
   path: ''
+  dependsOn: ''
 
 jobs:
 - job: NpmInstall
   displayName: 'npm install'
-  dependsOn: CheckChanges
+  dependsOn: "$ {{ parameters.dependsOn }}"
   condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
   - bash: |

@@ -63,8 +63,5 @@ stages:
       - task: Docker@2
         displayName: Logout from DockerHub
         inputs:
-        command: logout
-        containerRegistry: "NicoAndra DockerHub"
-
-      
-        
+          command: logout
+          containerRegistry: "NicoAndra DockerHub"

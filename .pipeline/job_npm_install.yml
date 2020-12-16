@@ -4,10 +4,10 @@ parameters:
 jobs:
 - job: NpmInstall
   displayName: 'npm install'
+  depeondsOn: CheckChanges
   condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
   - bash: |
-      cd "${{ parameters.path }}"
-      npm install
+      echo "WILL INSTALL IN ${{ parameters.path }}"
     name: npm_install
     displayName: 'Install NPM dependencies'

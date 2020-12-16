@@ -24,11 +24,7 @@ function App() {
 
       <Container fluid={true} className="vh-90" as="main">
         <Switch>
-          <Route
-            exact
-            path="/"
-            component={Home}
-          />
+          <Route exact path="/" component={Home} />
           <Route exact path="/credentials" component={Credentials} />
           <Route
             path="/browse/:bucketName/:prefixes?"

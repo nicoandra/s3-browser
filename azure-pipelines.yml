@@ -38,11 +38,6 @@ stages:
       steps:
       - bash: |
           echo RefTags
-    - job: ReleasesTags
-      condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
-      steps:
-      - bash: |
-          echo ReleasesTags
           echo build.sourceBranch $build.sourceBranch
           echo build.sourceBranch ${{ parameters.path }}
   - stage: 'BuildBackEnd'

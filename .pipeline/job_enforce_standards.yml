@@ -12,11 +12,11 @@ jobs:
       cd ${{ parameters.path }}
       npm install
       npm run lint:check
-      npm run test
+      CI=true npm run test
     name: EnforceStandards
     displayName: 'Enforce standards'
   - bash: |
-      npm run test:cov
+      CI=true npm run test:cov
     name: CodeCoverage
     displayName: 'Code Coverage'
 

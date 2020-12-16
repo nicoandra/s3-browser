@@ -24,11 +24,7 @@ function App() {
 
       <Container fluid={true} className="vh-90" as="main">
         <Switch>
-          <Route
-            exact
-            path="/"
-            component={Home}
-          />
+          <Route exact path="/" component={Home} />
           <Route exact path="/credentials" component={Credentials} />
           <Route
             path="/browse/:bucketName/:prefixes?"
@@ -40,6 +36,7 @@ function App() {
       <Navbar bg="secondary" variant="light" className="App-footer vh-5" sticky="bottom" expand="false">
         <Nav.Link as="div">
           <Link to="https://github.com/nicoandra/s3-browser">Source code</Link>
+          
         </Nav.Link>
       </Navbar>
     </Container>

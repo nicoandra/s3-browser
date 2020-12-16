@@ -40,7 +40,7 @@ export class S3Service {
     });
   }
 
-  async listBucketContents(params: ListAWSS3BucketObjectsDto) {
+  async listBucketContents(params: ListAWSS3BucketObjectsDto) : Promise<AWS.S3.ListObjectsV2Output> {
     this.getClient();
     return new Promise((ok, ko) => {
       this.s3Client.listObjectsV2(

@@ -28,16 +28,14 @@ stages:
     - template: '.pipeline/job_npm_install.yml'
       parameters:
         path: 'frontend/'
-      dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
       condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   - stage: 'BuildBackEnd'
     jobs:
-      - template: '.pipeline/job_check_changes.yml'
-        parameters:
-          path: 'backend/'
-      - template: '.pipeline/job_npm_install.yml'
-        parameters:
-          path: 'backend/'
-        dependsOn: CheckChanges # <- Important: Mark previous job as dependency        
-        condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
+    - template: '.pipeline/job_check_changes.yml'
+      parameters:
+        path: 'backend/'
+    - template: '.pipeline/job_npm_install.yml'
+      parameters:
+        path: 'backend/'
+      condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
         

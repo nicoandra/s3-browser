@@ -4,6 +4,7 @@ parameters:
 jobs:
 - job: NpmInstall
   displayName: 'npm install'
+  dependsOn: CheckChanges
   steps:
   - bash: |
       cd "${{ parameters.path }}"

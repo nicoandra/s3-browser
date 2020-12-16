@@ -31,9 +31,9 @@ stages:
     - job: "ShowVariables"
       steps:
       - bash: |
-          echo "isMainBranch: $(variables.isMainBranch)"
-          echo "isTagRelease: $(variables.isTagRelease)"
-          echo "dockerImageName: $(variables.dockerImageName)"
+          echo "isMainBranch: $(isMainBranch)"
+          echo "isTagRelease: $(isTagRelease)"
+          echo "dockerImageName: $(dockerImageName)"
   - stage: 'InstallOS'
     jobs:
     - job: "InstallOS"
@@ -81,7 +81,7 @@ stages:
         condition: eq(variables.isTagRelease, true)
         inputs:
           command: push
-          repository: $(variables.dockerImageName)
+          repository: $(dockerImageName)
           tags: |
             $(build.sourceBranchName)
       - task: Docker@2

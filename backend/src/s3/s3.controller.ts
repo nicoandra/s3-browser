@@ -27,10 +27,9 @@ export class S3Controller {
       prefixes,
       ...queryParams,
     });
-    const result = await this.s3Service.listBucketContents(
+    return this.s3Service.listBucketContents(
       params.toListAWSS3BucketObjectsDto(),
     );
-    return GetBucketContentResponseDto.fromAwsResponse(result);
   }
 
   @Get('/:bucketName/:object/download')

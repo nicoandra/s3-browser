@@ -6,7 +6,7 @@ services:
       context: backend
       target: development
     ports:
-      - 3000:3000
+      - 5000:5000
       - 9229:9229 # For NodeJs Debugger
     volumes:
       - ./backend:/usr/src/app
@@ -31,7 +31,7 @@ services:
       context: frontend
       target: development
     ports:
-      - 5000:3000
+      - 3000:3000
       - 9230:9229 # For NodeJs Debugger
     volumes:
       - ./frontend:/usr/src/app

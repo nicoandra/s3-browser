@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
 import * as readline from 'readline';
-import { AWSS3ObjectVersionDto, BucketAttributesDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, ListAWSS3BucketObjectsDto } from './dto';
+import { AWSS3ObjectVersionDto, BucketAttributesDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, GetBucketContentResponseDto, ListAWSS3BucketObjectsDto } from './dto';
 
 @Injectable()
 export class S3Service {
@@ -40,7 +40,7 @@ export class S3Service {
     });
   }
 
-  async listBucketContents(params: ListAWSS3BucketObjectsDto) : Promise<AWS.S3.ListObjectsV2Output> {
+  async listBucketContents(params: ListAWSS3BucketObjectsDto) : Promise<GetBucketContentResponseDto> {
     this.getClient();
     return new Promise((ok, ko) => {
       this.s3Client.listObjectsV2(
@@ -50,6 +50,8 @@ export class S3Service {
           return ok(data);
         },
       );
+    }).then((result) => {
+      return GetBucketContentResponseDto.fromAwsResponse(result);
     });
   }
 

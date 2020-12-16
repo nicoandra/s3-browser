@@ -26,6 +26,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
+  - stage: "Show variables"
+    jobs:
+      job: "Show variables"
+      steps:
+      - bash: |
+        echo "isMainBranch: $(variables.isMainBranch)"
+        echo "isTagRelease: $(variables.isTagRelease)"
+        echo "dockerImageName: $(variables.dockerImageName)"
   - stage: 'InstallOS'
     jobs:
     - job: "InstallOS"

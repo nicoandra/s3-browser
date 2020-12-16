@@ -35,15 +35,13 @@ stages:
     - job: RefTags
       condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
       steps:
-      - bash: | 
-        echo "RefTags"
-
+      - bash: |
+          echo RefTags
     - job: ReleasesTags
       condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
       steps:
       - bash: |
-        echo "ReleasesTags"
-
+          echo ReleasesTags
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'

@@ -39,7 +39,7 @@ stages:
       - bash: |
           echo RefTags
           echo build.sourceBranch $build.sourceBranch
-          echo build.sourceBranch ${{ parameters.path }}
+          echo build.sourceBranch "${{ build.sourceBranch }}"
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'

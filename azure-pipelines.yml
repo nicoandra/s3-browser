@@ -2,7 +2,11 @@
 
 
 trigger:
-- main  
+  branches:
+    include:
+    - main
+    - refs/tags/*
+    - releases/tags/*
 
 pr:
 - main
@@ -28,6 +32,14 @@ stages:
     - template: '.pipeline/enforce_standards.yml'
       parameters:
         path: 'frontend/'
+    - job: RefTags
+      condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+      - bash: |
+        echo "RefTags"
+    - job: ReleasesTags
+      condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
+      - bash: |
+        echo "ReleasesTags"        
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'
@@ -36,5 +48,13 @@ stages:
     - template: '.pipeline/enforce_standards.yml'
       parameters:
       path: 'frontend/'
+    - job: RefTags
+      condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+      - bash: |
+        echo "RefTags"
+    - job: ReleasesTags
+      condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
+      - bash: |
+        echo "ReleasesTags"       
       
         

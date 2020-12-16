@@ -85,8 +85,7 @@ export class S3Controller {
       res.write(l + "\n")
     }
     res.end()
- 
-  } 
+   } 
 
   @Get('/:bucketName/:object/grep/history')
   async grepObjectVersionsGenerator(

@@ -28,7 +28,6 @@ stages:
     - template: '.pipeline/job_npm_install.yml'
       parameters:
         path: 'frontend/'
-        dependsOn: 'CheckChanges'
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'
@@ -37,6 +36,5 @@ stages:
     - template: '.pipeline/job_npm_install.yml'
       parameters:
         path: 'backend/'
-        dependsOn: 'CheckChanges'
       
         

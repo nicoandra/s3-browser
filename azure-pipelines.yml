@@ -26,9 +26,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-  - stage: "Show variables"
+  - stage: "ShowVariables"
     jobs:
-    - job: "Show variables"
+    - job: "ShowVariables"
       steps:
       - bash: |
           echo "isMainBranch: $(variables.isMainBranch)"

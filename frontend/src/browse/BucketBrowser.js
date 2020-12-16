@@ -17,9 +17,7 @@ export function BucketBrowser(props) {
 
   return (
     <Row className="h-100">
-      <BucketList
-        onBucketSelectionChange={bucketSelectionHandler}
-      />
+      <BucketList onBucketSelectionChange={bucketSelectionHandler} />
       <BucketContent
         bucketName={activeBucketName}
         prefixes={currentPrefixesParams}

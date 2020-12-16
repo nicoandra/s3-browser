@@ -1,0 +1,11 @@
+.env
+.dockerignore
+node_modules
+coverage
+.git
+.gitignore
+azure-pipelines.yml
+.pipelines
+/frontend/build
+/backend/dist
+/backend/test

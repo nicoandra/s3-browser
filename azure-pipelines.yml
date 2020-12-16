@@ -2,7 +2,12 @@
 
 
 trigger:
-- main  
+  branches:
+    include:
+    - main
+    - refs/tags/*
+    - releases/tags/*
+    - azure-pipeline
 
 pr:
 - main
@@ -25,16 +30,26 @@ stages:
     - template: '.pipeline/job_check_changes.yml'
       parameters:
         path: 'frontend/'
-    - template: '.pipeline/job_npm_install.yml'
+    - template: '.pipeline/job_enforce_standards.yml'
       parameters:
         path: 'frontend/'
+    - job: RefTags
+      condition: startsWith(variables['build.sourceBranch'], 'refs/tags/')
+      steps:
+      - bash: |
+          echo RefTags
+    - job: ReleasesTags
+      condition: startsWith(variables['build.sourceBranch'], 'releases/tags/')
+      steps:
+      - bash: |
+          echo ReleasesTags
   - stage: 'BuildBackEnd'
     jobs:
     - template: '.pipeline/job_check_changes.yml'
       parameters:
         path: 'backend/'
-    - template: '.pipeline/job_npm_install.yml'
+    - template: '.pipeline/job_enforce_standards.yml'
       parameters:
-        path: 'backend/'
+        path: 'frontend/'    
       
         

@@ -34,7 +34,9 @@ export function BucketList(props) {
 
   return (
     <Nav
-      className={"flex-column col-md-2 d-none d-md-block bg-light sidebar overflow-auto p-4"}
+      className={
+        "flex-column col-md-2 d-none d-md-block bg-light sidebar overflow-auto p-4"
+      }
     >
       <Form>
         <Form.Control

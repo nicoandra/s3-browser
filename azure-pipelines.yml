@@ -28,7 +28,7 @@ pool:
 stages:
   - stage: "Show variables"
     jobs:
-      job: "Show variables"
+    - job: "Show variables"
       steps:
       - bash: |
         echo "isMainBranch: $(variables.isMainBranch)"

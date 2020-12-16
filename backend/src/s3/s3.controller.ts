@@ -88,42 +88,6 @@ export class S3Controller {
  
   } 
 
-
-  @Get('/:bucketName/:object/grep/history-g')
-  async grepObjectVersions(
-    @Param('bucketName') bucketName: string,
-    @Param('object') key: string,
-    @Query('text') text: string,
-    @Res() res,
-  ) {
-    const request = new GetAWSS3ObjectDto();
-    request.bucket = bucketName;
-    request.key = key;
-
-    const s3Object = await this.s3Service.getObjectHeaders(request);
-    res.append('Content-Type', s3Object.ContentType);
-
-    const s3Versions = await this.s3Service.getObjectVersions(request);
-    
-    for await (const s3Version of s3Versions) {
-      const request = new GetAWSS3ObjectDto();
-      request.bucket = bucketName;
-      request.key = key;
-      request.versionId = s3Version.versionId
-      const readLine = this.s3Service.getObjectReadLineInterface(request);
-
-      for await (const l of readLine) {
-        if (false === l.includes(text)) {
-          continue;
-        }
-        res.write(`[${s3Version.updatedAt.toISOString()}] : ${l}\n`)
-      }
-    }
-
-    res.end()
-  }
-
-
   @Get('/:bucketName/:object/grep/history')
   async grepObjectVersionsGenerator(
     @Param('bucketName') bucketName: string,

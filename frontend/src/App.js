@@ -36,6 +36,7 @@ function App() {
       <Navbar bg="secondary" variant="light" className="App-footer vh-5" sticky="bottom" expand="false">
         <Nav.Link as="div">
           <Link to="https://github.com/nicoandra/s3-browser">Source code</Link>
+          
         </Nav.Link>
       </Navbar>
     </Container>

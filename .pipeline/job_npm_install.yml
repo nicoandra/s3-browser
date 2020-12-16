@@ -4,7 +4,7 @@ parameters:
 jobs:
 - job: NpmInstall
   displayName: 'npm install'
-  depeondsOn: CheckChanges
+  dependsOn: CheckChanges
   condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
   - bash: |

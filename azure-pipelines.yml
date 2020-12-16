@@ -17,7 +17,7 @@ variables:
 - name: isMainBranch
   value: $[eq(variables['build.sourceBranch'], 'refs/heads/master')]
 - name: isTagRelease
-  value: $[startsWith(variables['build.sourceBranch'], 'refs/tags/v']
+  value: $[startsWith(variables['build.sourceBranch'], 'refs/tags/v')]
 - name: dockerImageName
   value: nicoandra/s3-browser
 

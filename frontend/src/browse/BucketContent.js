@@ -18,7 +18,7 @@ import {
   Spinner,
   Form,
   Button,
-  Container,
+  Container, Alert
 } from "react-bootstrap";
 import * as prettyBytes from "pretty-bytes";
 import * as QueryString from "query-string";
@@ -47,6 +47,7 @@ export function BucketContent(props) {
   ] = useState();
   const baseUri = "browse";
   const [ready, setReady] = useState(false);
+  const [errorResponse, setErrorResponse] = useState(false);
 
   const memoizedFetchContent = useCallback(
     (continuationToken) => {
@@ -67,8 +68,11 @@ export function BucketContent(props) {
             setPrefixes(res.prefixes);
             setContinuationTokenFromResponse(res.continuationToken);
             setReady(true);
+            setErrorResponse(false);
           }
-        );
+        ).catch((err) => {
+          setErrorResponse(err)
+        });;
       };
 
       fetchContent(continuationToken);
@@ -104,10 +108,26 @@ export function BucketContent(props) {
     "d-flex align-items-center justify-content-center",
   ].join(" ");
 
+  if (errorResponse) {
+    return (
+      <Container className={classNames}>
+        <Row>
+          <Col>
+            <Alert variant="danger">
+              <h2 className="alert-heading"><b>{errorResponse.statusCode}:</b> {errorResponse.title}</h2>
+              <p>{errorResponse.message}</p>
+          </Alert>            
+          </Col>
+        </Row>
+      </Container>
+    );
+  }
+  
+  
   if (bucketName === undefined || !ready) {
     const content =
       bucketName === undefined ? (
-        <span class="align-middle">Pick a bucket</span>
+        <span className="align-middle">Pick a bucket</span>
       ) : (
         <Spinner animation="border" variant="primary" />
       );

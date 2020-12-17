@@ -1,4 +1,5 @@
-import { Controller, Get, Inject, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, HttpException, Inject, NotFoundException, Param, Query, Res } from '@nestjs/common';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 import {
   GetAWSS3ObjectDto,
   GetBucketContentRequestDto,
@@ -13,6 +14,7 @@ export class S3Controller {
 
   @Get('/')
   async get() {
+    // throw new NotFoundException()
     return this.s3Service.listBuckets();
   }
 

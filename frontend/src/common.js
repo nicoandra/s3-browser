@@ -24,7 +24,12 @@ export const get = async function (path) {
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((r) => r.json());
+  }).then(async (r) => {
+    if (r.ok) {
+      return r.json()
+    }
+    throw await r.json()
+  });
 };
 
 export const getStream = async function (path) {

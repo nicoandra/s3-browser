@@ -79,6 +79,7 @@ stages:
           command: build
           tags: |
             $(build.sourceBranchName)
+            latest
       - task: Docker@2
         displayName: Push Tag
         condition: eq(variables.isTagRelease, true)

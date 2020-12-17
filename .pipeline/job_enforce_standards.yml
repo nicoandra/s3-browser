@@ -8,13 +8,18 @@ jobs:
   condition: eq(dependencies.CheckChanges.outputs['check_changes.SOURCE_CODE_CHANGED'], 'true')
   steps:
   - bash: |
-      echo "Preparing ${{ parameters.path }}"
       cd ${{ parameters.path }}
       npm install
+    name: NPMInstall
+    displayName: 'NPM Install'
+  - bash: |
       npm run lint:check
+    name: Linter
+    displayName: 'Linter'
+  - bash: |
       CI=true npm run test
-    name: EnforceStandards
-    displayName: 'Enforce standards'
+    name: Tests
+    displayName: 'Run Test Suite'
   - bash: |
       CI=true npm run test:cov
     name: CodeCoverage

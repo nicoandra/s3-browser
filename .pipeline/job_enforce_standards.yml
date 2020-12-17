@@ -13,14 +13,17 @@ jobs:
     name: NPMInstall
     displayName: 'NPM Install'
   - bash: |
+      cd ${{ parameters.path }}
       npm run lint:check
     name: Linter
     displayName: 'Linter'
   - bash: |
+      cd ${{ parameters.path }}
       CI=true npm run test
     name: Tests
     displayName: 'Run Test Suite'
   - bash: |
+      cd ${{ parameters.path }}
       CI=true npm run test:cov
     name: CodeCoverage
     displayName: 'Code Coverage'

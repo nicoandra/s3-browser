@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { get } from "./../common";
 import { Link } from "react-router-dom";
-import { Row, Col, Container, Spinner, Nav, Form, Alert } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Container,
+  Spinner,
+  Nav,
+  Form,
+  Alert,
+} from "react-bootstrap";
 
 export function BucketList(props) {
   const [bucketList, setBucketList] = useState([]);
@@ -15,25 +23,28 @@ export function BucketList(props) {
 
   useEffect(() => {
     setReady(false);
-    get("/s3").then((res) => {
-      setErrorResponse(false)
-      setBucketList(res);
-      setReady(true);
-    }).catch((err) => {
-      setErrorResponse(err)
-    });
+    get("/s3")
+      .then((res) => {
+        setErrorResponse(false);
+        setBucketList(res);
+        setReady(true);
+      })
+      .catch((err) => {
+        setErrorResponse(err);
+      });
   }, []);
 
-  
   if (errorResponse) {
     return (
       <Container>
         <Row>
           <Col>
             <Alert variant="danger">
-              <h2 className="alert-heading"><b>{errorResponse.statusCode}:</b> {errorResponse.title}</h2>
+              <h2 className="alert-heading">
+                <b>{errorResponse.statusCode}:</b> {errorResponse.title}
+              </h2>
               <p>{errorResponse.message}</p>
-          </Alert>            
+            </Alert>
           </Col>
         </Row>
       </Container>

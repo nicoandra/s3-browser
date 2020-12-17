@@ -26,9 +26,9 @@ export const get = async function (path) {
     },
   }).then(async (r) => {
     if (r.ok) {
-      return r.json()
+      return r.json();
     }
-    throw await r.json()
+    throw await r.json();
   });
 };
 

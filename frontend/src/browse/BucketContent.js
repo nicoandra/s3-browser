@@ -18,7 +18,8 @@ import {
   Spinner,
   Form,
   Button,
-  Container, Alert
+  Container,
+  Alert,
 } from "react-bootstrap";
 import * as prettyBytes from "pretty-bytes";
 import * as QueryString from "query-string";
@@ -62,17 +63,17 @@ export function BucketContent(props) {
         const continuationTokenUri = continuationToken
           ? `continuationToken=${encodeURIComponent(continuationToken)}&`
           : "";
-        get(`/s3/${bucketName}${prefixesUri}?${continuationTokenUri}`).then(
-          (res) => {
+        get(`/s3/${bucketName}${prefixesUri}?${continuationTokenUri}`)
+          .then((res) => {
             setContents(res.contents);
             setPrefixes(res.prefixes);
             setContinuationTokenFromResponse(res.continuationToken);
             setReady(true);
             setErrorResponse(false);
-          }
-        ).catch((err) => {
-          setErrorResponse(err)
-        });;
+          })
+          .catch((err) => {
+            setErrorResponse(err);
+          });
       };
 
       fetchContent(continuationToken);
@@ -114,16 +115,17 @@ export function BucketContent(props) {
         <Row>
           <Col>
             <Alert variant="danger">
-              <h2 className="alert-heading"><b>{errorResponse.statusCode}:</b> {errorResponse.title}</h2>
+              <h2 className="alert-heading">
+                <b>{errorResponse.statusCode}:</b> {errorResponse.title}
+              </h2>
               <p>{errorResponse.message}</p>
-          </Alert>            
+            </Alert>
           </Col>
         </Row>
       </Container>
     );
   }
-  
-  
+
   if (bucketName === undefined || !ready) {
     const content =
       bucketName === undefined ? (

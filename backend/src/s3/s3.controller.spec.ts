@@ -4,6 +4,7 @@ import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
 import { CredentialsModule } from './../credentials/credentials.module';
 import { GetBucketContentResponseDto } from './dto';
+import { ConfigModule } from '@nestjs/config';
 
 describe('S3Controller', () => {
   let controller: S3Controller;
@@ -11,8 +12,7 @@ describe('S3Controller', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [forwardRef(() => CredentialsModule)],
-
+      imports: [forwardRef(() => CredentialsModule), ConfigModule],
       controllers: [S3Controller],
       providers: [S3Service],
     }).compile();
@@ -44,7 +44,7 @@ describe('S3Controller', () => {
 
   it('should list bucket contents', async () => {
     jest.spyOn(service, 'listBucketContents').mockImplementation(async () => {
-      return <AWS.S3.ListObjectsV2Output>{ Contents: [], CommonPrefixes: [] };
+      return <GetBucketContentResponseDto>new GetBucketContentResponseDto();
     });
     const result = await controller.listContent(
       'bucketName',

@@ -88,7 +88,7 @@ export class GetAWSS3ObjectDto extends BucketReferenceDto {
 export class GetBucketContentResponseDto {
   currentPrefixes: string[] = [];
   prefixes: string[] = [];
-  contents: BucketElementDto[];
+  contents: BucketElementDto[] = [];
   truncated = false;
   continuationToken = '';
 

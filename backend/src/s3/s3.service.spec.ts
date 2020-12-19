@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CredentialsModule } from './../credentials/credentials.module';
+import { ConfigModule } from '@nestjs/config';
 import { S3Service } from './s3.service';
 
 describe('S3Service', () => {
@@ -7,7 +8,7 @@ describe('S3Service', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [CredentialsModule],
+      imports: [CredentialsModule, ConfigModule],
       providers: [S3Service],
     }).compile();
 

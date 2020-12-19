@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3Service } from './../s3/s3.service';
-import { CredentialsDto, SetCredentialsRequestDto } from './dto';
+import { CredentialsDto } from './dto';
 
 @Injectable()
 export class CredentialsService {
@@ -16,11 +16,6 @@ export class CredentialsService {
       accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
       secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
     };
-  }
-
-  save(payload: SetCredentialsRequestDto): CredentialsDto {
-    /*CredentialsService.credentials = payload*/
-    return CredentialsService.credentials;
   }
 
   async validate() {

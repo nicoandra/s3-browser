@@ -13,12 +13,9 @@ import {
   BucketAttributesDto,
   BucketReferenceDto,
   GetAWSS3ObjectDto,
-  GetAWSS3ObjectVersionsDto,
   GetBucketContentRequestDto,
   GetBucketContentResponseDto,
-  ListAWSS3BucketObjectsDto,
 } from './dto';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
 export class S3Service {

@@ -9,8 +9,6 @@ describe('S3Controller', () => {
   let controller: S3Controller;
   let service: S3Service;
 
-  beforeAll(async () => {});
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [forwardRef(() => CredentialsModule)],

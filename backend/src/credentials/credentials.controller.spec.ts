@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { forwardRef } from '@nestjs/common';
 
 import { CredentialsController } from './credentials.controller';
-import { S3Service } from './../s3/s3.service';
 import { S3Module } from './../s3/s3.module';
 import { CredentialsService } from './credentials.service';
 

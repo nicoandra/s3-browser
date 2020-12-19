@@ -19,5 +19,6 @@ describe('CredentialsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(s3service).toBeDefined();
   });
 });

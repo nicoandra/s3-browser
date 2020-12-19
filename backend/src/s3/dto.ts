@@ -10,14 +10,14 @@ export class SetCredentialsRequestDto {
 export class ListAWSS3BucketObjectsDto {
   Bucket: string;
   ContinuationToken?: string;
-  Delimiter: string = '/';
-  FetchOwner: boolean = false;
-  MaxKeys: number = 1000;
-  Prefix: string = '';
+  Delimiter = '/';
+  FetchOwner = false;
+  MaxKeys = 1000;
+  Prefix = '';
 }
 
 export class BucketReferenceDto {
-  bucket: string = '';
+  bucket = '';
 }
 export class GetBucketContentRequestDto extends BucketReferenceDto {
   prefixes?: string = '';
@@ -89,8 +89,8 @@ export class GetBucketContentResponseDto {
   currentPrefixes: string[] = [];
   prefixes: string[] = [];
   contents: BucketElementDto[];
-  truncated: boolean = false;
-  continuationToken: string = '';
+  truncated = false;
+  continuationToken = '';
 
   static fromAwsResponse(
     response: AWS.S3.ListObjectsV2Output,
@@ -121,7 +121,7 @@ export class BucketElementDto {
 
   static fromAwsResponseContentRow(
     row: AWS.S3.Object,
-    prefix: string = '',
+    prefix = '',
   ): BucketElementDto {
     const result = new BucketElementDto();
     result.key = row.Key;
@@ -134,7 +134,7 @@ export class BucketElementDto {
 }
 
 export class ObjectHeaders {
-  contentLength: number = 0;
+  contentLength = 0;
   contentType: string;
 }
 

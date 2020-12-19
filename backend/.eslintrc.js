@@ -21,4 +21,10 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
+  overrides: [{
+    "files": [ "**/__mocks__/**" ],
+    "rules": {
+      "@typescript-eslint/no-empty-function": 0
+    }
+  }]
 };

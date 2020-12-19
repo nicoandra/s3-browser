@@ -37,7 +37,7 @@ export class S3Service {
     }
   }
 
-  getClient() {
+  private getClient() {
     if (this.s3Client === undefined) {
       const credentials = this.credentialsService.get();
       this.s3Client = new AWS.S3({ ...credentials, apiVersion: '2006-03-01' });
@@ -45,7 +45,7 @@ export class S3Service {
     return this.s3Client;
   }
 
-  async listBuckets(): Promise<BucketAttributesDto[]> {
+  public async listBuckets(): Promise<BucketAttributesDto[]> {
     if (this.whitelistedBuckets)
       return this.whitelistedBuckets.map((bucket) => {
         return <BucketAttributesDto>{
@@ -72,7 +72,7 @@ export class S3Service {
     });
   }
 
-  async listBucketContents(
+  public async listBucketContents(
     params: GetBucketContentRequestDto,
   ): Promise<GetBucketContentResponseDto> {
     this.validateGetAwsObjectRequest(params);
@@ -92,7 +92,7 @@ export class S3Service {
     });
   }
 
-  async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
+  public async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
     this.validateGetAwsObjectRequest(params);
 
     this.getClient();
@@ -109,7 +109,7 @@ export class S3Service {
     });
   }
 
-  async getObjectVersions(
+  public async getObjectVersions(
     params: GetAWSS3ObjectDto,
   ): Promise<AWSS3ObjectVersionDto[]> {
     this.validateGetAwsObjectRequest(params);
@@ -129,7 +129,7 @@ export class S3Service {
     });
   }
 
-  getObjectReadStream(params: GetAWSS3ObjectDto) {
+  public getObjectReadStream(params: GetAWSS3ObjectDto) {
     this.validateGetAwsObjectRequest(params);
 
     this.getClient();
@@ -145,7 +145,7 @@ export class S3Service {
     });
   }
 
-  async *grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
+  public async *grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
     this.validateGetAwsObjectRequest(params);
     const reader = this.getObjectReadLineInterface(params);
 

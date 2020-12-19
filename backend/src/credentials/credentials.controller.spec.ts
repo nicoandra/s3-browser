@@ -8,13 +8,17 @@ import { ConfigModule } from '@nestjs/config';
 
 describe('CredentialsController', () => {
   let controller: CredentialsController;
+  let mockCredentialsService: CredentialsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [forwardRef(() => S3Module), ConfigModule],
       controllers: [CredentialsController],
       providers: [CredentialsService],
-    }).compile();
+    })
+      .overrideProvider(CredentialsService)
+      .useValue(mockCredentialsService)
+      .compile();
 
     controller = module.get<CredentialsController>(CredentialsController);
   });

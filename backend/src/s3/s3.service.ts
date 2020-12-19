@@ -114,10 +114,7 @@ export class S3Service {
   }
 
   async* grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
-    const reader = readline.createInterface({
-      input: this.getObjectReadStream(params),
-      terminal: false
-    });
+    const reader = this.getObjectReadLineInterface(params);
 
     for await (const l of reader) {
       const match = words.reduce((match, word) => {

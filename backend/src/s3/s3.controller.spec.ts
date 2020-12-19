@@ -11,15 +11,14 @@ jest.mock('./s3.service');
 describe('S3Controller', () => {
   let controller: S3Controller;
   let service: S3Service;
-  let configService: ConfigService
+  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [forwardRef(() => CredentialsModule)],
       controllers: [S3Controller],
       providers: [S3Service],
-    })
-    .compile();
+    }).compile();
 
     service = module.get<S3Service>(S3Service);
     controller = module.get<S3Controller>(S3Controller);

@@ -7,6 +7,8 @@ export class SetCredentialsRequestDto {
   @ApiProperty() secretAccessKey: string;
 }
 
+
+
 export class ListAWSS3BucketObjectsDto {
   Bucket: string;
   ContinuationToken?: string;
@@ -16,8 +18,11 @@ export class ListAWSS3BucketObjectsDto {
   Prefix: string = '';
 }
 
-export class GetBucketContentRequestDto {
-  bucketName: string = '';
+
+export class BucketReferenceDto {
+  bucket: string = '';
+}
+export class GetBucketContentRequestDto extends BucketReferenceDto {
   prefixes?: string = '';
   continuationToken?: string = '';
 
@@ -25,7 +30,7 @@ export class GetBucketContentRequestDto {
     params: GetBucketContentRequestDto,
   ): GetBucketContentRequestDto => {
     const result = new GetBucketContentRequestDto();
-    result.bucketName = params.bucketName;
+    result.bucket = params.bucket;
     result.prefixes = (params.prefixes || '')
       .split('|')
       .map((r) => r.replace(/\//g, ''))
@@ -36,7 +41,7 @@ export class GetBucketContentRequestDto {
 
   toListAWSS3BucketObjectsDto = (): ListAWSS3BucketObjectsDto => {
     const result = new ListAWSS3BucketObjectsDto();
-    result.Bucket = this.bucketName;
+    result.Bucket = this.bucket;
     this.continuationToken.length
       ? (result.ContinuationToken = this.continuationToken)
       : '';
@@ -46,6 +51,41 @@ export class GetBucketContentRequestDto {
     return result;
   };
 }
+export class GetAWSS3ObjectDto extends BucketReferenceDto {
+  key: string;
+  byteRangeStart?: number
+  byteRangeEnd?: number
+  versionId?: string
+
+  toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
+    const result = {
+      Bucket: this.bucket,
+      Key: this.key,
+    };
+
+    if (this.byteRangeEnd !== undefined && this.byteRangeStart !== undefined && (this.byteRangeStart < this.byteRangeEnd)) {
+        result["Range"] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`
+    }
+
+    if (this.versionId !== undefined) {
+      result["VersionId"] = this.versionId
+    }
+    return result;
+  }
+
+  toAwsGetObjectVersionsRequest(): AWS.S3.ListObjectVersionsRequest {
+    const result = {
+      Bucket: this.bucket,
+      Prefix: this.key,
+      MaxKeys: 5
+    };
+
+    return result;
+  }
+}
+
+
+
 
 export class GetBucketContentResponseDto {
   currentPrefixes: string[] = [];
@@ -102,39 +142,6 @@ export class ObjectHeaders {
   contentType: string;
 }
 
-export class GetAWSS3ObjectDto {
-  key: string;
-  bucket: string;
-  byteRangeStart?: number
-  byteRangeEnd?: number
-  versionId?: string
-
-  toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
-    const result = {
-      Bucket: this.bucket,
-      Key: this.key,
-    };
-
-    if (this.byteRangeEnd !== undefined && this.byteRangeStart !== undefined && (this.byteRangeStart < this.byteRangeEnd)) {
-        result["Range"] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`
-    }
-
-    if (this.versionId !== undefined) {
-      result["VersionId"] = this.versionId
-    }
-    return result;
-  }
-
-  toAwsGetObjectVersionsRequest(): AWS.S3.ListObjectVersionsRequest {
-    const result = {
-      Bucket: this.bucket,
-      Prefix: this.key,
-      MaxKeys: 5
-    };
-
-    return result;
-  }
-}
 
 export class GetObjectDto {
   headers: ObjectHeaders;

@@ -25,13 +25,11 @@ export class S3Controller {
     @Query() queryParams: GetBucketContentRequestDto,
   ) : Promise<GetBucketContentResponseDto> {
     const params = GetBucketContentRequestDto.fromParams({
-      bucketName,
+      bucket: bucketName,
       prefixes,
       ...queryParams,
     });
-    return this.s3Service.listBucketContents(
-      params.toListAWSS3BucketObjectsDto(),
-    );
+    return this.s3Service.listBucketContents(params);
   }
 
   @Get('/:bucketName/:object/download')

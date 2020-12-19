@@ -2,9 +2,8 @@ import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-
   @Get()
   getHello(): string {
-    return "S3 Browser";
+    return 'S3 Browser';
   }
 }

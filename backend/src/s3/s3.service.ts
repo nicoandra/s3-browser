@@ -1,25 +1,43 @@
-import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
 import * as readline from 'readline';
-import { AWSS3ObjectVersionDto, BucketAttributesDto, BucketReferenceDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, GetBucketContentRequestDto, GetBucketContentResponseDto, ListAWSS3BucketObjectsDto } from './dto';
+import {
+  AWSS3ObjectVersionDto,
+  BucketAttributesDto,
+  BucketReferenceDto,
+  GetAWSS3ObjectDto,
+  GetAWSS3ObjectVersionsDto,
+  GetBucketContentRequestDto,
+  GetBucketContentResponseDto,
+  ListAWSS3BucketObjectsDto,
+} from './dto';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
 export class S3Service {
   s3Client: AWS.S3;
-  whitelistedBuckets: false|string[] = false
+  whitelistedBuckets: false | string[] = false;
 
   constructor(
     @Inject(forwardRef(() => CredentialsService))
     private credentialsService: CredentialsService,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {
-      const whitelistedBuckets = this.configService.get<string>('S3_BROWSER_WHITELISTED_BUCKETS', '').split(',').map((r :string)  => r.trim()).filter(l => l.length)
-      if (whitelistedBuckets.length) {
-        this.whitelistedBuckets = whitelistedBuckets
-      }
+    const whitelistedBuckets = this.configService
+      .get<string>('S3_BROWSER_WHITELISTED_BUCKETS', '')
+      .split(',')
+      .map((r: string) => r.trim())
+      .filter((l) => l.length);
+    if (whitelistedBuckets.length) {
+      this.whitelistedBuckets = whitelistedBuckets;
+    }
   }
 
   getClient() {
@@ -30,13 +48,14 @@ export class S3Service {
     return this.s3Client;
   }
 
-  async listBuckets() : Promise<BucketAttributesDto[]>{
-    if (this.whitelistedBuckets) return this.whitelistedBuckets.map((bucket) => {
-      return <BucketAttributesDto> {
-        name: bucket,
-        createdAt: new Date(),
-      };
-    });
+  async listBuckets(): Promise<BucketAttributesDto[]> {
+    if (this.whitelistedBuckets)
+      return this.whitelistedBuckets.map((bucket) => {
+        return <BucketAttributesDto>{
+          name: bucket,
+          createdAt: new Date(),
+        };
+      });
 
     this.getClient();
     return new Promise((ok, ko) => {
@@ -48,7 +67,7 @@ export class S3Service {
       );
     }).then((buckets: [AWS.S3.Bucket]) => {
       return buckets.map((bucket) => {
-        return <BucketAttributesDto> {
+        return <BucketAttributesDto>{
           name: bucket.Name,
           createdAt: bucket.CreationDate,
         };
@@ -56,10 +75,12 @@ export class S3Service {
     });
   }
 
-  async listBucketContents(params: GetBucketContentRequestDto) : Promise<GetBucketContentResponseDto> {
-    this.validateGetAwsObjectRequest(params)
+  async listBucketContents(
+    params: GetBucketContentRequestDto,
+  ): Promise<GetBucketContentResponseDto> {
+    this.validateGetAwsObjectRequest(params);
     this.getClient();
-    const clientParams = params.toListAWSS3BucketObjectsDto()
+    const clientParams = params.toListAWSS3BucketObjectsDto();
 
     return new Promise((ok, ko) => {
       this.s3Client.listObjectsV2(
@@ -75,7 +96,7 @@ export class S3Service {
   }
 
   async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
-    this.validateGetAwsObjectRequest(params)
+    this.validateGetAwsObjectRequest(params);
 
     this.getClient();
 
@@ -91,8 +112,10 @@ export class S3Service {
     });
   }
 
-  async getObjectVersions(params: GetAWSS3ObjectDto): Promise<AWSS3ObjectVersionDto[]> {
-    this.validateGetAwsObjectRequest(params)
+  async getObjectVersions(
+    params: GetAWSS3ObjectDto,
+  ): Promise<AWSS3ObjectVersionDto[]> {
+    this.validateGetAwsObjectRequest(params);
 
     this.getClient();
     return new Promise((ok, ko) => {
@@ -105,12 +128,12 @@ export class S3Service {
         },
       );
     }).then((data: AWS.S3.ListObjectVersionsOutput) => {
-      return AWSS3ObjectVersionDto.fromAWSS3ListObjectVersionsOutput(data)
+      return AWSS3ObjectVersionDto.fromAWSS3ListObjectVersionsOutput(data);
     });
   }
 
   getObjectReadStream(params: GetAWSS3ObjectDto) {
-    this.validateGetAwsObjectRequest(params)
+    this.validateGetAwsObjectRequest(params);
 
     this.getClient();
     const s3Params = params.toAwsGetObjectRequest();
@@ -118,30 +141,31 @@ export class S3Service {
   }
 
   private getObjectReadLineInterface(params: GetAWSS3ObjectDto) {
-    this.validateGetAwsObjectRequest(params)
+    this.validateGetAwsObjectRequest(params);
     return readline.createInterface({
       input: this.getObjectReadStream(params),
-      terminal: false
+      terminal: false,
     });
   }
 
-  async* grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
-    this.validateGetAwsObjectRequest(params)
+  async *grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
+    this.validateGetAwsObjectRequest(params);
     const reader = this.getObjectReadLineInterface(params);
 
     for await (const l of reader) {
       const match = words.reduce((match, word) => {
-        return match && l.includes(word)
-      }, true)
+        return match && l.includes(word);
+      }, true);
 
-      if(match) yield l
+      if (match) yield l;
     }
   }
 
-  private validateGetAwsObjectRequest(params: BucketReferenceDto) : void {
-    if (!this.whitelistedBuckets) return
-    if (this.whitelistedBuckets.includes(params.bucket)) return
-    throw new UnauthorizedException("The requested bucket can't be accessed through this tool.")
+  private validateGetAwsObjectRequest(params: BucketReferenceDto): void {
+    if (!this.whitelistedBuckets) return;
+    if (this.whitelistedBuckets.includes(params.bucket)) return;
+    throw new UnauthorizedException(
+      "The requested bucket can't be accessed through this tool.",
+    );
   }
-
 }

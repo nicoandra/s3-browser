@@ -5,8 +5,7 @@ import { S3Module } from './../s3/s3.module';
 
 describe('CredentialsService', () => {
   let service: CredentialsService;
-  let s3service : S3Service;
-
+  let s3service: S3Service;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

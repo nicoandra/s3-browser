@@ -9,13 +9,13 @@ export class CredentialsService {
 
   constructor(
     @Inject(forwardRef(() => S3Service)) private s3Service: S3Service,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {
     CredentialsService.credentials = <CredentialsDto>{
       region: this.configService.get<string>('AWS_REGION', 'us-east-2'),
       accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY')
-    }
+      secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+    };
   }
 
   save(payload: SetCredentialsRequestDto): CredentialsDto {

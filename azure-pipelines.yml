@@ -60,7 +60,7 @@ stages:
         path: 'backend/'
     - template: '.pipeline/job_enforce_standards.yml'
       parameters:
-        path: 'frontend/'    
+        path: 'backend/'    
   - stage: 'DockerBuildAndPush'
     jobs:
     - job: RefTags

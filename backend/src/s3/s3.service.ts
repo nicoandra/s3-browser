@@ -1,9 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
 import * as readline from 'readline';
 import { AWSS3ObjectVersionDto, BucketAttributesDto, GetAWSS3ObjectDto, GetAWSS3ObjectVersionsDto, GetBucketContentResponseDto, ListAWSS3BucketObjectsDto } from './dto';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
 export class S3Service {
@@ -71,7 +72,9 @@ export class S3Service {
   }
 
   async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
+    this.validateGetAwsObjectRequest(params)
     this.getClient();
+
     return new Promise((ok, ko) => {
       const s3Params = params.toAwsGetObjectRequest();
       this.s3Client.headObject(
@@ -106,7 +109,7 @@ export class S3Service {
     return this.s3Client.getObject(s3Params).createReadStream();
   }
 
-  getObjectReadLineInterface(params: GetAWSS3ObjectDto) {
+  private getObjectReadLineInterface(params: GetAWSS3ObjectDto) {
     return readline.createInterface({
       input: this.getObjectReadStream(params),
       terminal: false
@@ -123,5 +126,12 @@ export class S3Service {
 
       if(match) yield l
     }
-  }  
+  }
+
+  private validateGetAwsObjectRequest(params: GetAWSS3ObjectDto) : void {
+    if (!this.whitelistedBuckets) return
+    if (this.whitelistedBuckets.includes(params.bucket)) return
+    throw new UnauthorizedException("The requested bucket can't be accessed through this tool.")
+  }
+
 }

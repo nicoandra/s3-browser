@@ -9,7 +9,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const message = exception.message
-    const status = (exception.statusCode ? exception.statusCode : (exception.code ? exception.code : 500));
+    const status = (exception.status ? exception.status : (exception.code ? exception.code : 500));
     const title = exception.name || "Exception"
 
     response

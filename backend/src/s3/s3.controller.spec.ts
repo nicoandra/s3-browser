@@ -4,19 +4,17 @@ import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
 import { CredentialsModule } from './../credentials/credentials.module';
 import { GetBucketContentResponseDto } from './dto';
+import { ConfigModule } from '@nestjs/config';
 
 describe('S3Controller', () => {
   let controller: S3Controller;
-  let service : S3Service;
-
-  beforeAll(async() => {})
+  let service: S3Service;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [forwardRef(() => CredentialsModule)],
-
+      imports: [forwardRef(() => CredentialsModule), ConfigModule],
       controllers: [S3Controller],
-      providers: [S3Service]
+      providers: [S3Service],
     }).compile();
 
     service = module.get<S3Service>(S3Service);
@@ -28,20 +26,37 @@ describe('S3Controller', () => {
   });
 
   it('should list buckets', async () => {
-    jest.spyOn(service, 'listBuckets').mockImplementation(async () => { return [] });
-    const result = await controller.get()
+    jest.spyOn(service, 'listBuckets').mockImplementation(async () => {
+      return [];
+    });
+    const result = await controller.get();
     expect(result).toEqual([]);
 
-    jest.spyOn(service, 'listBuckets').mockImplementation(async () => [{name: "OneBucket", createdAt: new Date(2020, 1, 2, 3, 5, 6)}]);
-    expect(await controller.get()).toEqual([{name: "OneBucket", createdAt: new Date(2020, 1, 2, 3, 5, 6)}]);
+    jest
+      .spyOn(service, 'listBuckets')
+      .mockImplementation(async () => [
+        { name: 'OneBucket', createdAt: new Date(2020, 1, 2, 3, 5, 6) },
+      ]);
+    expect(await controller.get()).toEqual([
+      { name: 'OneBucket', createdAt: new Date(2020, 1, 2, 3, 5, 6) },
+    ]);
   });
 
   it('should list bucket contents', async () => {
-    jest.spyOn(service, 'listBucketContents').mockImplementation(async ()  => { return <AWS.S3.ListObjectsV2Output>{ Contents: [], CommonPrefixes: [] }} );
-    const result = await controller.listContent("bucketName", undefined, undefined)
-    expect(result).toEqual(<GetBucketContentResponseDto>{
-      currentPrefixes: [], prefixes: [], contents: [], truncated: false, continuationToken: ''
+    jest.spyOn(service, 'listBucketContents').mockImplementation(async () => {
+      return <GetBucketContentResponseDto>new GetBucketContentResponseDto();
     });
-
-  });  
+    const result = await controller.listContent(
+      'bucketName',
+      undefined,
+      undefined,
+    );
+    expect(result).toEqual(<GetBucketContentResponseDto>{
+      currentPrefixes: [],
+      prefixes: [],
+      contents: [],
+      truncated: false,
+      continuationToken: '',
+    });
+  });
 });

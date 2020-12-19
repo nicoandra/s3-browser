@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CredentialsService } from './credentials.service';
+import { ConfigModule } from '@nestjs/config';
 import { S3Service } from './../s3/s3.service';
 import { S3Module } from './../s3/s3.module';
 
 describe('CredentialsService', () => {
   let service: CredentialsService;
-  let s3service : S3Service;
-
+  let s3service: S3Service;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [S3Module],
+      imports: [S3Module, ConfigModule],
       providers: [CredentialsService, S3Service],
     }).compile();
 
@@ -20,5 +20,6 @@ describe('CredentialsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(s3service).toBeDefined();
   });
 });

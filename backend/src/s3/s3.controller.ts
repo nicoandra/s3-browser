@@ -1,5 +1,4 @@
-import { Controller, Get, HttpException, Inject, NotFoundException, Param, Query, Res } from '@nestjs/common';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { Controller, Get, Inject, Param, Query, Res } from '@nestjs/common';
 import {
   GetAWSS3ObjectDto,
   GetBucketContentRequestDto,
@@ -7,14 +6,12 @@ import {
 } from './dto';
 import { S3Service } from './s3.service';
 
-
 @Controller('s3')
 export class S3Controller {
   constructor(@Inject(S3Service) private s3Service: S3Service) {}
 
   @Get('/')
   async get() {
-    // throw new NotFoundException()
     return this.s3Service.listBuckets();
   }
 
@@ -23,15 +20,13 @@ export class S3Controller {
     @Param('bucketName') bucketName: string,
     @Param('prefixes') prefixes: string,
     @Query() queryParams: GetBucketContentRequestDto,
-  ) : Promise<GetBucketContentResponseDto> {
+  ): Promise<GetBucketContentResponseDto> {
     const params = GetBucketContentRequestDto.fromParams({
-      bucketName,
+      bucket: bucketName,
       prefixes,
       ...queryParams,
     });
-    return this.s3Service.listBucketContents(
-      params.toListAWSS3BucketObjectsDto(),
-    );
+    return this.s3Service.listBucketContents(params);
   }
 
   @Get('/:bucketName/:object/download')
@@ -40,7 +35,6 @@ export class S3Controller {
     @Param('object') key: string,
     @Res() res,
   ) {
-    const params = { bucket: bucketName, key: decodeURIComponent(key) };
     const request = new GetAWSS3ObjectDto();
     request.bucket = bucketName;
     request.key = key;
@@ -60,13 +54,13 @@ export class S3Controller {
     const request = new GetAWSS3ObjectDto();
     request.bucket = bucketName;
     request.key = key;
-    request.byteRangeStart = 0
-    request.byteRangeEnd = 256 * 1024
+    request.byteRangeStart = 0;
+    request.byteRangeEnd = 256 * 1024;
 
     const s3Object = await this.s3Service.getObjectHeaders(request);
     res.append('Content-Type', s3Object.ContentType);
     this.s3Service.getObjectReadStream(request).pipe(res);
-  }  
+  }
 
   @Get('/:bucketName/:object/grep')
   async grepObject(
@@ -82,12 +76,12 @@ export class S3Controller {
     const s3Object = await this.s3Service.getObjectHeaders(request);
     res.append('Content-Type', s3Object.ContentType);
 
-    const readLine = this.s3Service.grepObject(request, text.split("|"));
+    const readLine = this.s3Service.grepObject(request, text.split('|'));
     for await (const l of readLine) {
-      res.write(l + "\n")
+      res.write(l + '\n');
     }
-    res.end()
-   } 
+    res.end();
+  }
 
   @Get('/:bucketName/:object/grep/history')
   async grepObjectVersionsGenerator(
@@ -104,19 +98,19 @@ export class S3Controller {
     res.append('Content-Type', s3Object.ContentType);
 
     const s3Versions = await this.s3Service.getObjectVersions(request);
-    
+
     for await (const s3Version of s3Versions) {
       const request = new GetAWSS3ObjectDto();
       request.bucket = bucketName;
       request.key = key;
-      request.versionId = s3Version.versionId
-      const readLine = this.s3Service.grepObject(request, text.split("|"));
+      request.versionId = s3Version.versionId;
+      const readLine = this.s3Service.grepObject(request, text.split('|'));
 
       for await (const l of readLine) {
-        res.write(`[${s3Version.updatedAt.toISOString()}] : ${l}\n`)
+        res.write(`[${s3Version.updatedAt.toISOString()}] : ${l}\n`);
       }
     }
 
-    res.end()
-  }  
+    res.end();
+  }
 }

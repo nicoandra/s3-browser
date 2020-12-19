@@ -8,7 +8,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
-  
+
   const options = new DocumentBuilder()
     .setTitle('S3 Browser')
     .setDescription('API')
@@ -18,8 +18,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('doc', app, document);
 
-
-  const port = process.env.BACKEND_PORT ? parseInt(process.env.BACKEND_PORT) : 3000
+  const port = process.env.BACKEND_PORT
+    ? parseInt(process.env.BACKEND_PORT)
+    : 3000;
   await app.listen(port);
 }
 

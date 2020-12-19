@@ -10,14 +10,16 @@ export class SetCredentialsRequestDto {
 export class ListAWSS3BucketObjectsDto {
   Bucket: string;
   ContinuationToken?: string;
-  Delimiter: string = '/';
-  FetchOwner: boolean = false;
-  MaxKeys: number = 1000;
-  Prefix: string = '';
+  Delimiter = '/';
+  FetchOwner = false;
+  MaxKeys = 1000;
+  Prefix = '';
 }
 
-export class GetBucketContentRequestDto {
-  bucketName: string = '';
+export class BucketReferenceDto {
+  bucket = '';
+}
+export class GetBucketContentRequestDto extends BucketReferenceDto {
   prefixes?: string = '';
   continuationToken?: string = '';
 
@@ -25,7 +27,7 @@ export class GetBucketContentRequestDto {
     params: GetBucketContentRequestDto,
   ): GetBucketContentRequestDto => {
     const result = new GetBucketContentRequestDto();
-    result.bucketName = params.bucketName;
+    result.bucket = params.bucket;
     result.prefixes = (params.prefixes || '')
       .split('|')
       .map((r) => r.replace(/\//g, ''))
@@ -36,7 +38,7 @@ export class GetBucketContentRequestDto {
 
   toListAWSS3BucketObjectsDto = (): ListAWSS3BucketObjectsDto => {
     const result = new ListAWSS3BucketObjectsDto();
-    result.Bucket = this.bucketName;
+    result.Bucket = this.bucket;
     this.continuationToken.length
       ? (result.ContinuationToken = this.continuationToken)
       : '';
@@ -46,32 +48,66 @@ export class GetBucketContentRequestDto {
     return result;
   };
 }
+export class GetAWSS3ObjectDto extends BucketReferenceDto {
+  key: string;
+  byteRangeStart?: number;
+  byteRangeEnd?: number;
+  versionId?: string;
+
+  toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
+    const result = {
+      Bucket: this.bucket,
+      Key: this.key,
+    };
+
+    if (
+      this.byteRangeEnd !== undefined &&
+      this.byteRangeStart !== undefined &&
+      this.byteRangeStart < this.byteRangeEnd
+    ) {
+      result['Range'] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`;
+    }
+
+    if (this.versionId !== undefined) {
+      result['VersionId'] = this.versionId;
+    }
+    return result;
+  }
+
+  toAwsGetObjectVersionsRequest(): AWS.S3.ListObjectVersionsRequest {
+    const result = {
+      Bucket: this.bucket,
+      Prefix: this.key,
+      MaxKeys: 5,
+    };
+
+    return result;
+  }
+}
 
 export class GetBucketContentResponseDto {
   currentPrefixes: string[] = [];
   prefixes: string[] = [];
-  contents: BucketElementDto[];
-  truncated: boolean = false;
-  continuationToken: string = '';
+  contents: BucketElementDto[] = [];
+  truncated = false;
+  continuationToken = '';
 
   static fromAwsResponse(
     response: AWS.S3.ListObjectsV2Output,
   ): GetBucketContentResponseDto {
     const result = new GetBucketContentResponseDto();
     result.truncated = response.IsTruncated || false;
-    result.prefixes = response.CommonPrefixes?.map(
-      (entry: AWS.S3.CommonPrefix) => {
+    result.prefixes =
+      response.CommonPrefixes?.map((entry: AWS.S3.CommonPrefix) => {
         return entry.Prefix.substring(response.Prefix?.length || 0);
-      },
-    ).filter((s) => s.length > 0) || [];
+      }).filter((s) => s.length > 0) || [];
 
     result.contents = response.Contents.map((row: AWS.S3.Object) =>
       BucketElementDto.fromAwsResponseContentRow(row, response.Prefix),
     );
     result.continuationToken = response.NextContinuationToken || '';
-    result.currentPrefixes = response.Prefix?.split(`/`).filter(
-      (s) => s.length > 0,
-    ) || [];
+    result.currentPrefixes =
+      response.Prefix?.split(`/`).filter((s) => s.length > 0) || [];
     return result;
   }
 }
@@ -85,7 +121,7 @@ export class BucketElementDto {
 
   static fromAwsResponseContentRow(
     row: AWS.S3.Object,
-    prefix: string = '',
+    prefix = '',
   ): BucketElementDto {
     const result = new BucketElementDto();
     result.key = row.Key;
@@ -98,42 +134,8 @@ export class BucketElementDto {
 }
 
 export class ObjectHeaders {
-  contentLength: number = 0;
+  contentLength = 0;
   contentType: string;
-}
-
-export class GetAWSS3ObjectDto {
-  key: string;
-  bucket: string;
-  byteRangeStart?: number
-  byteRangeEnd?: number
-  versionId?: string
-
-  toAwsGetObjectRequest(): AWS.S3.GetObjectRequest {
-    const result = {
-      Bucket: this.bucket,
-      Key: this.key,
-    };
-
-    if (this.byteRangeEnd !== undefined && this.byteRangeStart !== undefined && (this.byteRangeStart < this.byteRangeEnd)) {
-        result["Range"] = `bytes=${this.byteRangeStart}-${this.byteRangeEnd}`
-    }
-
-    if (this.versionId !== undefined) {
-      result["VersionId"] = this.versionId
-    }
-    return result;
-  }
-
-  toAwsGetObjectVersionsRequest(): AWS.S3.ListObjectVersionsRequest {
-    const result = {
-      Bucket: this.bucket,
-      Prefix: this.key,
-      MaxKeys: 5
-    };
-
-    return result;
-  }
 }
 
 export class GetObjectDto {
@@ -152,35 +154,40 @@ export class GetObjectDto {
 }
 
 export class BucketAttributesDto {
-  name: string
-  createdAt: Date
+  name: string;
+  createdAt: Date;
 }
 
 export class GetAWSS3ObjectVersionsDto {
-    key: string;
-    bucket: string;
+  key: string;
+  bucket: string;
 }
 
 export class AWSS3ObjectVersionDto {
-  key: string
-  versionId: string
-  isLatest: bool
-  updatedAt: Date
+  key: string;
+  versionId: string;
+  isLatest: bool;
+  updatedAt: Date;
 
-  static fromAWSS3ListObjectVersionsOutput(data: AWS.S3.ListObjectVersionsOutput) : AWSS3ObjectVersionDto[] {
+  static fromAWSS3ListObjectVersionsOutput(
+    data: AWS.S3.ListObjectVersionsOutput,
+  ): AWSS3ObjectVersionDto[] {
     return data.Versions.map((v: AWS.S3.ObjectVersion) => {
-      const result = new AWSS3ObjectVersionDto()
-      result.key = v.Key
-      result.versionId = v.VersionId
-      result.isLatest = v.IsLatest
-      result.updatedAt = v.LastModified
-      return result
-    }).sort((a,b) => {
-      switch(true) {
-        case (a.updatedAt > b.updatedAt): return -1
-        case (a.updatedAt < b.updatedAt): return 1
-        default: return 0
+      const result = new AWSS3ObjectVersionDto();
+      result.key = v.Key;
+      result.versionId = v.VersionId;
+      result.isLatest = v.IsLatest;
+      result.updatedAt = v.LastModified;
+      return result;
+    }).sort((a, b) => {
+      switch (true) {
+        case a.updatedAt > b.updatedAt:
+          return -1;
+        case a.updatedAt < b.updatedAt:
+          return 1;
+        default:
+          return 0;
       }
-    })
+    });
   }
 }

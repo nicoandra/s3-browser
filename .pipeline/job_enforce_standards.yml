@@ -22,10 +22,10 @@ jobs:
       CI=true npm run test
     name: Tests
     displayName: 'Run Test Suite'
-  - bash: |
-      cd ${{ parameters.path }}
-      CI=true npm run test:cov
-    name: CodeCoverage
-    displayName: 'Code Coverage'
+  # - bash: |
+  #    cd ${{ parameters.path }}
+  #    CI=true npm run test:cov
+  #  name: CodeCoverage
+  #  displayName: 'Code Coverage'
 
 

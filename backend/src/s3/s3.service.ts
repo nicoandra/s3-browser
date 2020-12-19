@@ -73,6 +73,7 @@ export class S3Service {
 
   async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
     this.validateGetAwsObjectRequest(params)
+
     this.getClient();
 
     return new Promise((ok, ko) => {
@@ -88,6 +89,8 @@ export class S3Service {
   }
 
   async getObjectVersions(params: GetAWSS3ObjectDto): Promise<AWSS3ObjectVersionDto[]> {
+    this.validateGetAwsObjectRequest(params)
+
     this.getClient();
     return new Promise((ok, ko) => {
       const s3Params = params.toAwsGetObjectVersionsRequest();
@@ -104,12 +107,15 @@ export class S3Service {
   }
 
   getObjectReadStream(params: GetAWSS3ObjectDto) {
+    this.validateGetAwsObjectRequest(params)
+
     this.getClient();
     const s3Params = params.toAwsGetObjectRequest();
     return this.s3Client.getObject(s3Params).createReadStream();
   }
 
   private getObjectReadLineInterface(params: GetAWSS3ObjectDto) {
+    this.validateGetAwsObjectRequest(params)
     return readline.createInterface({
       input: this.getObjectReadStream(params),
       terminal: false
@@ -117,6 +123,7 @@ export class S3Service {
   }
 
   async* grepObject(params: GetAWSS3ObjectDto, words: string[] = []) {
+    this.validateGetAwsObjectRequest(params)
     const reader = this.getObjectReadLineInterface(params);
 
     for await (const l of reader) {

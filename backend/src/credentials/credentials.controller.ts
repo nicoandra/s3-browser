@@ -25,9 +25,4 @@ export class CredentialsController {
     }
     return result;
   }
-
-  @Get()
-  getCredentials(): CredentialsDto {
-    return this.credentialsService.get();
-  }
 }

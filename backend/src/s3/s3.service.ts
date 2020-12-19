@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CredentialsService } from './../credentials/credentials.service';
 import * as AWS from 'aws-sdk';
 import * as readline from 'readline';
@@ -7,11 +8,18 @@ import { AWSS3ObjectVersionDto, BucketAttributesDto, GetAWSS3ObjectDto, GetAWSS3
 @Injectable()
 export class S3Service {
   s3Client: AWS.S3;
+  whitelistedBuckets: false|string[] = false
 
   constructor(
     @Inject(forwardRef(() => CredentialsService))
     private credentialsService: CredentialsService,
-  ) {}
+    private configService: ConfigService
+  ) {
+      const whitelistedBuckets = this.configService.get<string>('S3_BROWSER_WHITELISTED_BUCKETS', '').split(',').map((r :string)  => r.trim()).filter(l => l.length)
+      if (whitelistedBuckets.length) {
+        this.whitelistedBuckets = whitelistedBuckets
+      }
+  }
 
   getClient() {
     if (this.s3Client === undefined) {
@@ -22,6 +30,13 @@ export class S3Service {
   }
 
   async listBuckets() : Promise<BucketAttributesDto[]>{
+    if (this.whitelistedBuckets) return this.whitelistedBuckets.map((bucket) => {
+      return <BucketAttributesDto> {
+        name: bucket,
+        createdAt: new Date(),
+      };
+    });
+
     this.getClient();
     return new Promise((ok, ko) => {
       this.s3Client.listBuckets(

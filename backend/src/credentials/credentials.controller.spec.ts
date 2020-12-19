@@ -4,7 +4,7 @@ import { forwardRef } from '@nestjs/common';
 import { CredentialsController } from './credentials.controller';
 import { S3Module } from './../s3/s3.module';
 import { CredentialsService } from './credentials.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 describe('CredentialsController', () => {
   let controller: CredentialsController;

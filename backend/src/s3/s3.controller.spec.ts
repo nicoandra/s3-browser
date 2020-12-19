@@ -4,14 +4,12 @@ import { S3Controller } from './s3.controller';
 import { S3Service } from './s3.service';
 import { CredentialsModule } from './../credentials/credentials.module';
 import { GetBucketContentResponseDto } from './dto';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 jest.mock('./s3.service');
 
 describe('S3Controller', () => {
   let controller: S3Controller;
   let service: S3Service;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

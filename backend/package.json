@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^7.5.1",
     "@nestjs/swagger": "^4.7.5",
     "aws-sdk": "^2.809.0",
+    "mockdate": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
@@ -67,7 +68,8 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s", "!src/**/__mocks__/**"
+      "**/*.(t|j)s",
+      "!src/**/__mocks__/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",

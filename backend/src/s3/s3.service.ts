@@ -20,24 +20,33 @@ import {
 @Injectable()
 export class S3Service {
   s3Client: AWS.S3;
-  whitelistedBuckets: false | string[] = false;
+  private whitelistedBuckets: false | string[] = false;
 
   constructor(
     @Inject(forwardRef(() => CredentialsService))
     private credentialsService: CredentialsService,
     private configService: ConfigService,
   ) {
-    const whitelistedBuckets = this.configService
-      .get<string>('S3_BROWSER_WHITELISTED_BUCKETS', '')
-      .split(',')
+    const whitelistedBuckets = this.configService.get<string>('S3_BROWSER_WHITELISTED_BUCKETS', '')
+    this.setWhitelistedBuckets(whitelistedBuckets)
+  }
+
+  public setWhitelistedBuckets(buckets: string) : void {
+    const whitelistedBuckets = buckets.split(',')
       .map((r: string) => r.trim())
       .filter((l) => l.length);
+
+      this.whitelistedBuckets = false
     if (whitelistedBuckets.length) {
       this.whitelistedBuckets = whitelistedBuckets;
     }
   }
 
-  private getClient() {
+  public setClient(client: AWS.S3) {
+    this.s3Client = client
+  }
+
+  private getClient(): AWS.S3 {
     if (this.s3Client === undefined) {
       const credentials = this.credentialsService.get();
       this.s3Client = new AWS.S3({ ...credentials, apiVersion: '2006-03-01' });
@@ -46,14 +55,15 @@ export class S3Service {
   }
 
   public async listBuckets(): Promise<BucketAttributesDto[]> {
-    if (this.whitelistedBuckets)
+    if (this.whitelistedBuckets) {
       return this.whitelistedBuckets.map((bucket) => {
         return <BucketAttributesDto>{
           name: bucket,
           createdAt: new Date(),
         };
       });
-
+    }
+  
     this.getClient();
     return new Promise((ok, ko) => {
       this.s3Client.listBuckets(

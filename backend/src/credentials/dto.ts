@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CommonDto } from './../common/dto';
 
-export class CredentialsDto {
+export class CredentialsDto extends CommonDto {
   region: string;
   accessKeyId: string;
   secretAccessKey: string;

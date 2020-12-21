@@ -7,7 +7,7 @@ import * as AWS from 'aws-sdk';
 import { ListBucketsOutput } from 'aws-sdk/clients/s3';
 
 jest.mock('aws-sdk');
-describe.only('S3Service', () => {
+describe('S3Service', () => {
   let service: S3Service;
   let refModule: TestingModule
 

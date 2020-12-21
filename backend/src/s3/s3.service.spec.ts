@@ -8,6 +8,7 @@ import { ListBucketsOutput } from 'aws-sdk/clients/s3';
 import { dtoFactory } from './../common/dto'
 import { BucketElementDto, GetBucketContentRequestDto, GetBucketContentResponseDto } from './dto';
 import { UnauthorizedException } from '@nestjs/common';
+import { assert } from 'console';
 
 jest.mock('aws-sdk');
 
@@ -84,6 +85,8 @@ describe('S3Service', () => {
       it.only('should list content for whitelisted buckets', async () => {
         MockDate.set('2020-01-02');
         service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
+
         const payload = dtoFactory({bucket: "one-bucket"}, GetBucketContentRequestDto)
         const expected = {
           contents: [
@@ -97,13 +100,18 @@ describe('S3Service', () => {
 
         const received = await service.listBucketContents(payload)
         expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
       })
 
       it.only('should not list contents for not whitelisted buckets when whitelist is set', async () => {
         MockDate.set('2020-01-02');
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
         service.setWhitelistedBuckets("one-bucket,another-bucket")
         const payload = dtoFactory({bucket: "not-allowed-bucket"}, GetBucketContentRequestDto)
         await expect(service.listBucketContents(payload)).rejects.toThrow(UnauthorizedException)
+        expect(spy).toHaveBeenCalledTimes(0)
+        spy.mockClear()
 
       })
     })

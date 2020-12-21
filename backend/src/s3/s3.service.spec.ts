@@ -82,7 +82,7 @@ describe('S3Service', () => {
 
   describe('should list bucket contents', () => {
     describe('when whitelist is set', () =>{
-      it.only('should list content for whitelisted buckets', async () => {
+      it('should list content for whitelisted buckets', async () => {
         MockDate.set('2020-01-02');
         service.setWhitelistedBuckets("one-bucket,another-bucket")
         const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
@@ -104,7 +104,7 @@ describe('S3Service', () => {
         spy.mockClear()
       })
 
-      it.only('should not list contents for not whitelisted buckets when whitelist is set', async () => {
+      it('should not list contents for not whitelisted buckets when whitelist is set', async () => {
         MockDate.set('2020-01-02');
         const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
         service.setWhitelistedBuckets("one-bucket,another-bucket")
@@ -112,13 +112,12 @@ describe('S3Service', () => {
         await expect(service.listBucketContents(payload)).rejects.toThrow(UnauthorizedException)
         expect(spy).toHaveBeenCalledTimes(0)
         spy.mockClear()
-
       })
     })
 
     describe('when whitelist is not set', () =>{
-      it.only('should list content for whitelisted buckets', () => {})
-      it.only('should not list contents for not whitelisted buckets when whitelist is set', () => {})
+      it('should list content for whitelisted buckets', () => {})
+      it('should not list contents for not whitelisted buckets when whitelist is set', () => {})
     })
   })
 

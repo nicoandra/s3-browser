@@ -1,4 +1,4 @@
-import { ListBucketsOutput } from "aws-sdk/clients/s3"
+import { ListBucketsOutput, ListObjectsV2Output, CommonPrefixList, CommonPrefix, ObjectList, Object, ListObjectsV2Request } from "aws-sdk/clients/s3"
 
 export class S3 {
     listBuckets(callback: Function) {
@@ -12,4 +12,19 @@ export class S3 {
         return callback(null, result)
       }
 
+      listObjectsV2(params: ListObjectsV2Request, callback: Function) {
+        const result : ListObjectsV2Output = {
+          IsTruncated: true,
+          CommonPrefixes: <CommonPrefixList>[
+            <CommonPrefix>{ Prefix: "prefix-one"},
+            <CommonPrefix>{ Prefix: "prefix-two"},
+          ],
+          Contents: <ObjectList>[
+            <Object>{Key: 'key-1', LastModified: new Date(), Size: 1},
+            <Object>{Key: 'key-2', LastModified: new Date(), Size: 2},
+            <Object>{Key: 'key-3', LastModified: new Date(), Size: 3},
+          ]
+        }
+        return callback(null, result);
+      }
 }

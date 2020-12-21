@@ -5,8 +5,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { S3Service } from './s3.service';
 import * as AWS from 'aws-sdk';
 import { ListBucketsOutput } from 'aws-sdk/clients/s3';
+import { dtoFactory } from './../common/dto'
+import { BucketElementDto, GetBucketContentRequestDto, GetBucketContentResponseDto } from './dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 jest.mock('aws-sdk');
+
 describe('S3Service', () => {
   let service: S3Service;
   let refModule: TestingModule
@@ -73,7 +77,41 @@ describe('S3Service', () => {
       
       expect(await service.listBuckets()).toEqual(expected)
     })    
-    
   });
+
+  describe('should list bucket contents', () => {
+    describe('when whitelist is set', () =>{
+      it.only('should list content for whitelisted buckets', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const payload = dtoFactory({bucket: "one-bucket"}, GetBucketContentRequestDto)
+        const expected = {
+          contents: [
+            {eTag: undefined, friendlyName: "key-1", key: "key-1", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 1},
+            {eTag: undefined, friendlyName: "key-2", key: "key-2", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 2},
+            {eTag: undefined, friendlyName: "key-3", key: "key-3", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 3},
+          ], 
+          continuationToken: "", 
+          currentPrefixes: [], 
+          prefixes: ["prefix-one", "prefix-two"], truncated: true}
+
+        const received = await service.listBucketContents(payload)
+        expect(received).toEqual(expected)
+      })
+
+      it.only('should not list contents for not whitelisted buckets when whitelist is set', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const payload = dtoFactory({bucket: "not-allowed-bucket"}, GetBucketContentRequestDto)
+        await expect(service.listBucketContents(payload)).rejects.toThrow(UnauthorizedException)
+
+      })
+    })
+
+    describe('when whitelist is not set', () =>{
+      it.only('should list content for whitelisted buckets', () => {})
+      it.only('should not list contents for not whitelisted buckets when whitelist is set', () => {})
+    })
+  })
 
 });

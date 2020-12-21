@@ -1,4 +1,4 @@
-import { ListBucketsOutput, ListObjectsV2Output, CommonPrefixList, CommonPrefix, ObjectList, Object, ListObjectsV2Request } from "aws-sdk/clients/s3"
+import { ListBucketsOutput, ListObjectsV2Output, CommonPrefixList, CommonPrefix, ObjectList, Object, ListObjectsV2Request, HeadObjectRequest, HeadObjectOutput } from "aws-sdk/clients/s3"
 
 export class S3 {
     listBuckets(callback: Function) {
@@ -24,6 +24,13 @@ export class S3 {
             <Object>{Key: 'key-2', LastModified: new Date(), Size: 2},
             <Object>{Key: 'key-3', LastModified: new Date(), Size: 3},
           ]
+        }
+        return callback(null, result);
+      }
+
+      headObject(params: HeadObjectRequest, callback: Function) {
+        const result : HeadObjectOutput = {
+          ContentType: "SomeContentType"
         }
         return callback(null, result);
       }

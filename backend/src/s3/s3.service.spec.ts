@@ -6,7 +6,7 @@ import { S3Service } from './s3.service';
 import * as AWS from 'aws-sdk';
 import { ListBucketsOutput } from 'aws-sdk/clients/s3';
 import { dtoFactory } from './../common/dto'
-import { BucketElementDto, GetBucketContentRequestDto, GetBucketContentResponseDto } from './dto';
+import { BucketElementDto, GetAWSS3ObjectDto, GetBucketContentRequestDto, GetBucketContentResponseDto } from './dto';
 import { UnauthorizedException } from '@nestjs/common';
 import { assert } from 'console';
 
@@ -81,7 +81,7 @@ describe('S3Service', () => {
   });
 
   describe('should list bucket contents', () => {
-    describe('when whitelist is set', () =>{
+    describe('when whitelist is set', () => {
       it('should list content for whitelisted buckets', async () => {
         MockDate.set('2020-01-02');
         service.setWhitelistedBuckets("one-bucket,another-bucket")
@@ -116,8 +116,83 @@ describe('S3Service', () => {
     })
 
     describe('when whitelist is not set', () =>{
-      it('should list content for whitelisted buckets', () => {})
-      it('should not list contents for not whitelisted buckets when whitelist is set', () => {})
+      it('should list contents', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
+
+        const payload = dtoFactory({bucket: "one-bucket"}, GetBucketContentRequestDto)
+        const expected = {
+          contents: [
+            {eTag: undefined, friendlyName: "key-1", key: "key-1", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 1},
+            {eTag: undefined, friendlyName: "key-2", key: "key-2", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 2},
+            {eTag: undefined, friendlyName: "key-3", key: "key-3", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 3},
+          ], 
+          continuationToken: "", 
+          currentPrefixes: [], 
+          prefixes: ["prefix-one", "prefix-two"], truncated: true}
+
+        const received = await service.listBucketContents(payload)
+        expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
+      })
+    })
+  })
+
+  describe.only('should get object headers', () => {
+    describe('when whitelist is set', () => {
+      it('should get object headers for whitelisted buckets', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'headObject');
+
+        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+        const expected = {
+          ContentType: "SomeContentType"
+        }
+
+        const received = await service.getObjectHeaders(payload)
+        expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
+      })
+
+      it('should not get object headers for not whitelisted buckets when whitelist is set', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'headObject');
+
+        const payload = dtoFactory({bucket: "not-allowed-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+
+        await expect(service.getObjectHeaders(payload)).rejects.toThrow(UnauthorizedException)
+        expect(spy).toHaveBeenCalledTimes(0)
+        spy.mockClear()        
+      })
+    })
+
+    describe('when whitelist is not set', () =>{
+      it('should list contents', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectsV2');
+
+        const payload = dtoFactory({bucket: "one-bucket"}, GetBucketContentRequestDto)
+        const expected = {
+          contents: [
+            {eTag: undefined, friendlyName: "key-1", key: "key-1", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 1},
+            {eTag: undefined, friendlyName: "key-2", key: "key-2", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 2},
+            {eTag: undefined, friendlyName: "key-3", key: "key-3", lastUpdate: new Date("2020-01-02T00:00:00.000Z"), size: 3},
+          ], 
+          continuationToken: "", 
+          currentPrefixes: [], 
+          prefixes: ["prefix-one", "prefix-two"], truncated: true}
+
+        const received = await service.listBucketContents(payload)
+        expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
+      })
     })
   })
 

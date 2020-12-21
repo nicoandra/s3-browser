@@ -104,9 +104,7 @@ export class S3Service {
 
   public async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
     this.validateGetAwsObjectRequest(params);
-
     this.getClient();
-
     return new Promise((ok, ko) => {
       const s3Params = params.toAwsGetObjectRequest();
       this.s3Client.headObject(

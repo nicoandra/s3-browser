@@ -252,37 +252,86 @@ describe('S3Service', () => {
     })
   })
 
-  describe.only('should get object versions', () => {
 
-    describe('can get a read stream', () =>{
+  describe('can get a read stream', () =>{
+    it('should get a read stream when whitelist is not set', async () => {
+      MockDate.set('2020-01-02');
+      service.setWhitelistedBuckets("")
+      const sent = "THISISAREADABLESTREAM"
+      const readableStream = Readable.from(sent)
+      const spy = jest.spyOn(AWS.S3.prototype, 'getObject').mockImplementationOnce(() => { return {
+        createReadStream: () => readableStream, 
+        abort: undefined, eachPage: undefined,
+        isPageable: undefined, send: undefined, on: undefined, onAsync: undefined, promise: undefined, startTime: undefined, httpRequest: undefined
+      }});
+
+      const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+
+      const received = await new Promise((ok, ko) => {
+        const readStream = service.getObjectReadStream(payload)
+        expect(spy).toHaveBeenCalledTimes(1)
+
+        readStream.on('data', (data) => {
+          return ok(data)
+        })
+      })
+      expect(sent).toEqual(received)
+      spy.mockClear()
+    })
+  })
+
+
+    describe('can grep a read stream', () =>{
       it('should get a read stream when whitelist is not set', async () => {
         MockDate.set('2020-01-02');
         service.setWhitelistedBuckets("")
-        const sent = "THISISAREADABLESTREAM"
-        const readableStream = Readable.from(sent)
-        const spy = jest.spyOn(AWS.S3.prototype, 'getObject').mockImplementationOnce(() => { return {
+        const sent = [...Array(50).keys()].map(l => `This is line number ${l}`).join("\n")
+        let readableStream = Readable.from(sent)
+        const spy = jest.spyOn(AWS.S3.prototype, 'getObject').mockImplementation(() => { return {
           createReadStream: () => readableStream, 
           abort: undefined, eachPage: undefined,
           isPageable: undefined, send: undefined, on: undefined, onAsync: undefined, promise: undefined, startTime: undefined, httpRequest: undefined
         }});
-
-        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
-
-
-        const received = await new Promise((ok, ko) => {
-          const readStream = service.getObjectReadStream(payload)
-          expect(spy).toHaveBeenCalledTimes(1)
   
-          readStream.on('data', (data) => {
-            return ok(data)
-          })
-        })
+        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+        let expected = [
+          "This is line number 6",
+          "This is line number 16",
+          "This is line number 26",
+          "This is line number 36",
+          "This is line number 46",
+        ]
+  
+        let received = []
+        for await (const l of service.grepObject(payload, ["6"])) {
+          received.push(l)
+        }
+        expect(received).toEqual(expected)
 
-        expect(sent).toEqual(received)
 
+        expected = [
+          "This is line number 26",
+        ]
+
+        readableStream = Readable.from(sent)
+        received = []
+        for await (const l of service.grepObject(payload, ["6","2"])) {
+          received.push(l)
+        }
+        expect(received).toEqual(expected)
+
+
+        expected = [...Array(50).keys()].map(l => `This is line number ${l}`)
+        readableStream = Readable.from(sent)
+        received = []
+        for await (const l of service.grepObject(payload)) {
+          received.push(l)
+        }
+        expect(received).toEqual(expected)
+        
         spy.mockClear()
-      })
-    })
+      })    
+
   })
 
 

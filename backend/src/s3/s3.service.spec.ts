@@ -4,11 +4,12 @@ import { CredentialsModule } from './../credentials/credentials.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { S3Service } from './s3.service';
 import * as AWS from 'aws-sdk';
-import { ListBucketsOutput } from 'aws-sdk/clients/s3';
+import { GetObjectOutput, ListBucketsOutput } from 'aws-sdk/clients/s3';
 import { dtoFactory } from './../common/dto'
 import { BucketElementDto, GetAWSS3ObjectDto, GetBucketContentRequestDto, GetBucketContentResponseDto } from './dto';
 import { UnauthorizedException } from '@nestjs/common';
 import { assert } from 'console';
+import { Readable } from 'stream'
 
 jest.mock('aws-sdk');
 
@@ -140,7 +141,7 @@ describe('S3Service', () => {
     })
   })
 
-  describe.only('should get object headers', () => {
+  describe('should get object headers', () => {
     describe('when whitelist is set', () => {
       it('should get object headers for whitelisted buckets', async () => {
         MockDate.set('2020-01-02');
@@ -195,5 +196,94 @@ describe('S3Service', () => {
       })
     })
   })
+
+
+  describe('should get object versions', () => {
+    describe('when whitelist is set', () => {
+      it('should get object versions for whitelisted buckets', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectVersions');
+
+        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+        const expected = [
+          {isLatest: true, key: "v100", updatedAt: new Date("2020-01-01T00:00:00.000Z"), versionId: "v100"}, 
+          {isLatest: false, key: "v95", updatedAt: new Date("2019-01-01T00:00:00.000Z"), versionId: "v95"}, 
+          {isLatest: false, key: "v90", updatedAt: new Date("2018-01-01T00:00:00.000Z"), versionId: "v90"}
+        ]
+
+        const received = await service.getObjectVersions(payload)
+        expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
+      })
+
+      it('should not get object versions for not whitelisted buckets when whitelist is set', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("one-bucket,another-bucket")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectVersions');
+
+        const payload = dtoFactory({bucket: "not-allowed-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+
+        await expect(service.getObjectVersions(payload)).rejects.toThrow(UnauthorizedException)
+        expect(spy).toHaveBeenCalledTimes(0)
+        spy.mockClear()        
+      })
+    })
+
+    describe('when whitelist is not set', () =>{
+      it('should get object versions when whitelist is not set', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("")
+        const spy = jest.spyOn(AWS.S3.prototype, 'listObjectVersions');
+
+        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+        const expected = [
+          {isLatest: true, key: "v100", updatedAt: new Date("2020-01-01T00:00:00.000Z"), versionId: "v100"}, 
+          {isLatest: false, key: "v95", updatedAt: new Date("2019-01-01T00:00:00.000Z"), versionId: "v95"}, 
+          {isLatest: false, key: "v90", updatedAt: new Date("2018-01-01T00:00:00.000Z"), versionId: "v90"}
+        ]
+
+        const received = await service.getObjectVersions(payload)
+        expect(received).toEqual(expected)
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
+      })
+    })
+  })
+
+  describe.only('should get object versions', () => {
+
+    describe('can get a read stream', () =>{
+      it('should get a read stream when whitelist is not set', async () => {
+        MockDate.set('2020-01-02');
+        service.setWhitelistedBuckets("")
+        const sent = "THISISAREADABLESTREAM"
+        const readableStream = Readable.from(sent)
+        const spy = jest.spyOn(AWS.S3.prototype, 'getObject').mockImplementationOnce(() => { return {
+          createReadStream: () => readableStream, 
+          abort: undefined, eachPage: undefined,
+          isPageable: undefined, send: undefined, on: undefined, onAsync: undefined, promise: undefined, startTime: undefined, httpRequest: undefined
+        }});
+
+        const payload = dtoFactory({bucket: "one-bucket", key: "key-1"}, GetAWSS3ObjectDto)
+
+
+        const received = await new Promise((ok, ko) => {
+          const readStream = service.getObjectReadStream(payload)
+          expect(spy).toHaveBeenCalledTimes(1)
+  
+          readStream.on('data', (data) => {
+            return ok(data)
+          })
+        })
+
+        expect(sent).toEqual(received)
+
+        spy.mockClear()
+      })
+    })
+  })
+
 
 });

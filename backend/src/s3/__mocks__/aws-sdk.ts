@@ -1,4 +1,5 @@
-import { ListBucketsOutput, ListObjectsV2Output, CommonPrefixList, CommonPrefix, ObjectList, Object, ListObjectsV2Request, HeadObjectRequest, HeadObjectOutput } from "aws-sdk/clients/s3"
+import { AWSError } from "aws-sdk";
+import { ListBucketsOutput, ListObjectsV2Output, CommonPrefixList, CommonPrefix, ObjectList, Object, ListObjectsV2Request, HeadObjectRequest, HeadObjectOutput, ListObjectVersionsRequest, ListObjectVersionsOutput, GetObjectOutput, GetObjectRequest } from "aws-sdk/clients/s3"
 
 export class S3 {
     listBuckets(callback: Function) {
@@ -33,5 +34,20 @@ export class S3 {
           ContentType: "SomeContentType"
         }
         return callback(null, result);
+      }
+
+      listObjectVersions(s3Params: ListObjectVersionsRequest, callback: Function) {
+        const result : ListObjectVersionsOutput = {
+          Versions: [
+            {Key: 'v100', VersionId: 'v100', IsLatest: true, LastModified: new Date("2020-01-01 00:00:00+0") },
+            {Key: 'v90', VersionId: 'v90', IsLatest: false, LastModified: new Date("2018-01-01 00:00:00+0") },
+            {Key: 'v95', VersionId: 'v95', IsLatest: false, LastModified: new Date("2019-01-01 00:00:00+0") }
+          ]
+        }
+        return callback(null, result)
+      }
+
+      getObject(s3Params: GetObjectRequest) {
+
       }
 }

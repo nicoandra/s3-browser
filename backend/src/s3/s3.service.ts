@@ -102,7 +102,7 @@ export class S3Service {
     });
   }
 
-  public async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<any> {
+  public async getObjectHeaders(params: GetAWSS3ObjectDto): Promise<AWS.S3.GetObjectOutput> {
     this.validateGetAwsObjectRequest(params);
     this.getClient();
     return new Promise((ok, ko) => {
